@@ -19,16 +19,16 @@ background:#131a2a; color:#eef3ff; font-family:"Noto Sans CJK SC","Microsoft YaH
 .card {background:#202c42; border:1px solid #526787; border-radius:20px; padding:28px;}
 .brand {color:#b6ccff; font-size:18px; margin-bottom:18px; letter-spacing:2px;}
 .content {font-size:22px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere;}
-</style></head><body><div class="card"><div class="brand">ASTRAL PARTY · 星趴助手</div>
+</style></head><body><div class="card"><div class="brand">ASTRAL PARTY · 星趴档案助手</div>
 <div class="content">{{ text | e }}</div></div></body></html>"""
 
 
 @register(
-    "astrbot_plugin_astralparty",
+    "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.1.0",
-    "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty",
+    "0.1.1",
+    "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
@@ -42,14 +42,15 @@ class AstralPartyPlugin(Star):
         async with self._start_lock:
             if self.service is None:
                 service = PartyService(
-                    StarTools.get_data_dir("astrbot_plugin_astralparty"), self.config
+                    StarTools.get_data_dir("astrbot_plugin_astralparty_dex"),
+                    self.config,
                 )
                 await service.start()
                 self.service, self.app = service, PartyApp(service)
 
     @filter.command("星趴", alias={"astralparty"})
     async def party_command(self, event: AstrMessageEvent):
-        """星趴助手：/星趴 帮助；/星趴 帮助 指令名 查看详细说明。"""
+        """星趴档案助手：/星趴 帮助；/星趴 帮助 指令名 查看详细说明。"""
         # Suppress subsequent default LLM handlers for both private and rejected group input.
         event.stop_event()
         try:

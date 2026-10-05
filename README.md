@@ -1,4 +1,4 @@
-# 星趴助手 · AstrBot 插件
+# 星趴档案助手 · AstrBot 插件
 
 让聊天用户绑定《吉星派对 / Astral Party》国服账号，查询个人档案、近期战绩、角色皮肤和逐轮复盘。
 
@@ -9,7 +9,7 @@
 在 AstrBot 管理面板的插件页，通过仓库地址安装：
 
 ```text
-https://github.com/LoraenKonpeki/astrbot_plugin_astralparty
+https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex
 ```
 
 需要 Python 3.10+、AstrBot 4.3.2+（4.x），依赖由 `requirements.txt` 声明。服务器应能访问国服 SDK、游戏 TCP 服务和回放服务器。无需在服务器安装游戏、桌面窗口或 Unity 资源提取库。
@@ -79,7 +79,9 @@ https://github.com/LoraenKonpeki/astrbot_plugin_astralparty
 
 ## 凭据与数据目录
 
-所有运行数据放在 AstrBot 的 `data/plugin_data/astrbot_plugin_astralparty/`，更新插件不会覆盖账号数据：
+若已安装旧名称版本，迁移时需将旧的 `data/plugin_data/astrbot_plugin_astralparty/` 整个目录复制到新数据目录，包含加密密钥；停用旧插件后启用新版。
+
+所有运行数据放在 AstrBot 的 `data/plugin_data/astrbot_plugin_astralparty_dex/`，更新插件不会覆盖账号数据：
 
 ```text
 credentials.key       # 自动生成的加密密钥，权限 0600

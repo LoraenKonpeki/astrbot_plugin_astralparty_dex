@@ -1,6 +1,6 @@
 """Single source of truth for general and per-command help."""
 
-GENERAL = """星趴助手 · 指令帮助
+GENERAL = """星趴档案助手 · 指令帮助
 
 账号（请私聊）
 /星趴 登录 手机号 —— 发送短信验证码
