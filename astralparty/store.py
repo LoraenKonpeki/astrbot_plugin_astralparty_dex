@@ -61,7 +61,7 @@ class CredentialStore:
             return json.loads(self.cipher.decrypt(path.read_bytes()))
         except (InvalidToken, ValueError, OSError):
             raise UserError(
-                "绑定数据无法读取，请私聊使用 /星趴 解绑 后重新登录。"
+                "绑定数据无法读取，请私聊使用 ~星趴 解绑 后重新登录。"
             ) from None
 
     def save(self, owner, record):

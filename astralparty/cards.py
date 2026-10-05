@@ -4,7 +4,7 @@ import base64
 from functools import lru_cache
 
 from .errors import UserError
-from .formatting import clean, page, stamp
+from .formatting import clean, stamp
 from .paths import asset
 from .profile import HERO, map_name
 from .review import SOURCE_TEXT
@@ -56,7 +56,6 @@ def card(title, subtitle, eyebrow, **kwargs):
         "title": clean(title),
         "subtitle": clean(subtitle, 200),
         "eyebrow": eyebrow,
-        "page": "",
         "avatar": "",
         "metrics": [],
         "section": "",
@@ -105,14 +104,14 @@ def profile_card(p):
         section="常用角色" if items else "",
         rows=items,
         footer=f"资料获取 {stamp(p['fetched_at'])} · 北京时间",
-        tip="需要更新资料时，请私聊 /星趴 刷新。",
+        tip="需要更新资料时，请私聊 ~星趴 刷新。",
     )
 
 
-def records_card(p, number=1):
-    records, n, count = page(p["recent"], number, 5)
+def records_card(p):
+    records = p["recent"]
     items = []
-    for index, r in enumerate(records, (n - 1) * 5 + 1):
+    for index, r in enumerate(records, 1):
         rank = r.get("rank", 0)
         items.append(
             row(
@@ -131,18 +130,18 @@ def records_card(p, number=1):
         "近期战绩",
         f"{clean(p['nick'])} · UID {p['uid']} · 最近 {len(p['recent'])} 局",
         "RECENT MATCHES",
-        page=f"{n} / {count}",
         section="对局记录",
         rows=items,
+        layout="grid",
         footer=f"资料获取 {stamp(p['fetched_at'])} · 北京时间",
-        tip="查看单局：/星趴 对局 序号 · 序号有效期 10 分钟。",
+        tip="查看单局：~星趴 对局 序号 · 序号有效期 10 分钟。",
     )
 
 
-def heroes_card(p, number=1):
-    heroes, n, count = page([h for h in p["heroes"] if h["owned"]], number, 8)
+def heroes_card(p):
+    heroes = [h for h in p["heroes"] if h["owned"]]
     items = []
-    for index, h in enumerate(heroes, (n - 1) * 8 + 1):
+    for index, h in enumerate(heroes, 1):
         rate = round(100 * h["w"] / h["n"], 1) if h["n"] else 0
         items.append(
             row(
@@ -160,22 +159,19 @@ def heroes_card(p, number=1):
         "角色使用排行",
         f"{clean(p['nick'])} · 按使用场次排序",
         "HERO COLLECTION",
-        page=f"{n} / {count}",
         section="已拥有角色",
         rows=items,
         layout="grid",
         footer=f"资料获取 {stamp(p['fetched_at'])} · 名称及潜能开放状态参考静态表。",
-        tip=f"翻页：/星趴 角色 {n + 1}" if n < count else "",
     )
 
 
-def skins_card(p, query="", number=1):
+def skins_card(p, query=""):
     skins = [s for s in p["skins"]["list"] if s["owns"]]
     if query:
         skins = [s for s in skins if query == str(s["id"]) or query in s["name"]]
         if not skins:
             raise UserError("未找到已拥有的匹配角色，请检查角色名或角色 ID。")
-    skins, n, count = page(skins, number, 3)
     items = [
         row(
             s["name"],
@@ -196,9 +192,9 @@ def skins_card(p, query="", number=1):
         "皮肤收藏",
         f"{clean(p['nick'])} · ✓ 已拥有 / ○ 未拥有",
         "SKIN COLLECTION",
-        page=f"{n} / {count}",
         section="角色与皮肤",
         rows=items,
+        layout="grid",
         footer=f"资料获取 {stamp(p['fetched_at'])} · 皮肤名称参考静态表。",
         tip="像素图用于标识角色，不代表对应皮肤外观。",
     )
@@ -250,18 +246,18 @@ def match_card(review, metadata=None):
             ("轮次", review["rounds"]),
         ),
         footer="统计由回放快照推导；缺失名次如实显示为未知。",
-        tip=f"逐轮复盘：/星趴 复盘 {review['replay_id']} 玩家UID",
+        tip=f"逐轮复盘：~星趴 复盘 {review['replay_id']} 玩家UID",
     )
 
 
-def review_card(review, uid, number=1):
+def review_card(review, uid):
     target = next((p for p in review["players"] if p["uid"] == uid), None)
     if target is None:
-        raise UserError("该 UID 不在这局回放中，请先使用 /星趴 对局 回放号 查看玩家。")
+        raise UserError("该 UID 不在这局回放中，请先使用 ~星趴 对局 回放号 查看玩家。")
     rounds = {r["round"]: r for r in target["rounds"]}
     for event in target["chip_events"]:
         rounds.setdefault(event.get("round") or 0, None)
-    values, n, count = page(sorted(rounds), number, 5)
+    values = sorted(rounds)
     items = []
     for rnd in values:
         r = rounds[rnd]
@@ -305,13 +301,10 @@ def review_card(review, uid, number=1):
         f"UID {uid} · {HERO.get(target['hero_id'], '未知角色')} · 回放 {review['replay_id']}",
         "ROUND TIMELINE",
         avatar=pixel(target["hero_id"]),
-        page=f"{n} / {count}",
         section="战况与筹码",
         rows=items,
+        layout="grid",
         footer="逐轮统计与筹码来源由回放推导，可能存在未知项。",
-        tip=f"下一页：/星趴 复盘 {review['replay_id']} {uid} {n + 1}"
-        if n < count
-        else "已到最后一页。",
     )
 
 
@@ -323,44 +316,3 @@ def text_card(text):
         "ASTRAL PARTY",
         rows=[row("查询结果", details=[{"label": "", "value": clean(text, 1800)}])],
     )
-
-
-def _chunks(items, size):
-    return [items[i : i + size] for i in range(0, len(items), size)] or [[]]
-
-
-def card_pages(model):
-    """Limit large skin/event collections without dropping details or changing command pages."""
-    rows = []
-    for original in model["rows"]:
-        details = _chunks(original["details"], 8)
-        chips = _chunks(original["chips"], 20)
-        for index in range(max(len(details), len(chips))):
-            part = dict(original)
-            part["details"] = details[index] if index < len(details) else []
-            part["chips"] = chips[index] if index < len(chips) else []
-            if index:
-                part["title"] += "（续）"
-                part["metrics"] = []
-            rows.append(part)
-    groups, current, weight = [], [], 0
-    for item in rows:
-        size = len(item["title"]) + sum(len(str(v)) for v in item["meta"])
-        size += sum(len(c["label"]) for c in item["chips"])
-        size += sum(len(d["label"]) + len(d["value"]) for d in item["details"])
-        size += 120
-        if current and weight + size > 1400:
-            groups.append(current)
-            current, weight = [], 0
-        current.append(item)
-        weight += size
-    if current or not groups:
-        groups.append(current)
-    for index, group in enumerate(groups):
-        output = dict(model)
-        output["rows"] = group
-        if len(groups) > 1:
-            output["page"] = f"{model['page']} · 图片 {index + 1}/{len(groups)}".strip(
-                " ·"
-            )
-        yield output

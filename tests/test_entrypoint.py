@@ -142,3 +142,18 @@ async def test_image_card_uses_local_file_and_escaped_template(entrypoint):
     assert plugin.html_render.await_args.kwargs["return_url"] is False
     assert "{{ card.title | e }}" in module.CARD_TEMPLATE
     assert "{{ detail.value | e }}" in module.CARD_TEMPLATE
+
+
+async def test_long_query_renders_exactly_one_complete_image(entrypoint):
+    from astralparty.cards import card, row
+
+    plugin, _ = entrypoint
+    model = card("全部角色", "", "TEST", rows=[row(f"角色{i}", 101) for i in range(32)])
+    plugin.app = types.SimpleNamespace(
+        execute=AsyncMock(return_value=Reply("完整数据", True, model))
+    )
+    plugin.html_render = AsyncMock(return_value="/tmp/full-card.png")
+    results = [r async for r in plugin.party_command(Event("~星趴 角色"))]
+    assert len(results) == 1 and results[0].kind == "image"
+    plugin.html_render.assert_awaited_once()
+    assert len(plugin.html_render.await_args.args[1]["card"]["rows"]) == 32

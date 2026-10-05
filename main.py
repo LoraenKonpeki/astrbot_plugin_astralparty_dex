@@ -8,7 +8,7 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
 
 from .astralparty.app import PartyApp
-from .astralparty.cards import CARD_TEMPLATE, card_pages, text_card
+from .astralparty.cards import CARD_TEMPLATE, text_card
 from .astralparty.errors import UserError
 from .astralparty.formatting import split_text
 from .astralparty.service import PartyService
@@ -19,7 +19,7 @@ from .astralparty.store import owner_key
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.2.0",
+    "0.2.1",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
@@ -42,7 +42,7 @@ class AstralPartyPlugin(Star):
 
     @filter.command("星趴", alias={"astralparty"})
     async def party_command(self, event: AstrMessageEvent):
-        """星趴档案助手：/星趴 帮助；/星趴 帮助 指令名 查看详细说明。"""
+        """星趴档案助手：~星趴 帮助；~星趴 帮助 指令名 查看详细说明。"""
         # Suppress subsequent default LLM handlers for both private and rejected group input.
         event.stop_event()
         try:
@@ -61,25 +61,20 @@ class AstralPartyPlugin(Star):
             )
             if reply.card and self.config.get("image_cards", True):
                 try:
-                    images = []
                     visual = reply.visual or text_card(reply.text)
-                    for visual_page in card_pages(visual):
-                        image = await asyncio.wait_for(
-                            self.html_render(
-                                CARD_TEMPLATE,
-                                {"card": visual_page},
-                                return_url=False,
-                                options={
-                                    "full_page": True,
-                                    "viewport": {"width": 860, "height": 600},
-                                },
-                            ),
-                            timeout=45,
-                        )
-                        images.append(image)
-                    # Do not send partial image pages before falling back to the full text.
-                    for image in images:
-                        yield event.image_result(image).stop_event()
+                    image = await asyncio.wait_for(
+                        self.html_render(
+                            CARD_TEMPLATE,
+                            {"card": visual},
+                            return_url=False,
+                            options={
+                                "full_page": True,
+                                "viewport": {"width": 860, "height": 600},
+                            },
+                        ),
+                        timeout=45,
+                    )
+                    yield event.image_result(image).stop_event()
                     return
                 except Exception as exc:
                     # Exception values or tracebacks may contain URLs/input. Log only the type.

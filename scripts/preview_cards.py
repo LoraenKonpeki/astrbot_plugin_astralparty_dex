@@ -10,7 +10,6 @@ sys.path.insert(0, str(ROOT))
 
 from astralparty.cards import (  # noqa: E402
     CARD_TEMPLATE,
-    card_pages,
     heroes_card,
     match_card,
     profile_card,
@@ -121,10 +120,9 @@ def main():
         CARD_TEMPLATE
     )
     for name, model in models.items():
-        for index, part in enumerate(card_pages(model), 1):
-            path = destination / f"{name}-{index}.html"
-            path.write_text(template.render(card=part), encoding="utf-8")
-            print(path)
+        path = destination / f"{name}-1.html"
+        path.write_text(template.render(card=model), encoding="utf-8")
+        print(path)
 
 
 if __name__ == "__main__":

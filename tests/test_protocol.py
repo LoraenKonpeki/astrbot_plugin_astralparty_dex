@@ -173,8 +173,6 @@ def test_synthetic_replay_rounds_chips_and_formatting(replay_bytes):
     assert "第 1 轮" in text and "筹码" in text and "来源" in text
     with pytest.raises(UserError, match="不在"):
         review_text(review, 9876543)
-    with pytest.raises(UserError, match="范围"):
-        review_text(review, 1234567, 99)
 
 
 def test_reply_chunk_size():

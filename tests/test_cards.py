@@ -89,7 +89,7 @@ def test_unknown_hero_is_not_replaced_with_another_character(player):
     assert "placeholder" in render(model)
 
 
-def test_card_pagination_keeps_every_skin_and_event_detail():
+def test_single_card_keeps_every_skin_and_event_detail():
     original = cards.row(
         "皮肤",
         101,
@@ -97,24 +97,38 @@ def test_card_pagination_keeps_every_skin_and_event_detail():
         details=[{"label": f"来源{i}", "value": "测试"} for i in range(25)],
     )
     model = cards.card("测试", "", "TEST", rows=[original])
-    pages = list(cards.card_pages(model))
-    rows = [row for page in pages for row in page["rows"]]
-    assert [c["label"] for row in rows for c in row["chips"]] == [
-        f"皮肤{i}" for i in range(61)
-    ]
-    assert [d["label"] for row in rows for d in row["details"]] == [
-        f"来源{i}" for i in range(25)
-    ]
-    for page in pages:
-        render(page)
+    html = render(model)
+    for i in range(61):
+        assert f"皮肤{i}</span>" in html
+    for i in range(25):
+        assert f"来源{i}</strong>" in html
 
 
-def test_page_two_numbering_matches_text(player):
+def test_complete_records_have_continuous_numbering(player):
     p = profile_from_player(player)
     p["recent"] *= 10
-    model = cards.records_card(p, 2)
-    assert model["rows"][0]["ordinal"] == "06" and model["rows"][-1]["ordinal"] == "10"
-    assert model["page"] == "2 / 2"
+    model = cards.records_card(p)
+    assert len(model["rows"]) == 10
+    assert [r["ordinal"] for r in model["rows"]] == [f"{i:02d}" for i in range(1, 11)]
+    assert "页" not in render(model)
+
+
+def test_full_collections_and_rounds_are_not_truncated(player, replay_bytes):
+    p = profile_from_player(player)
+    p["heroes"] = [{**p["heroes"][0], "id": 101 + i, "owned": True} for i in range(32)]
+    p["skins"]["list"] = [
+        {**p["skins"]["list"][0], "id": 101 + i, "owns": True} for i in range(32)
+    ]
+    assert len(cards.heroes_card(p)["rows"]) == 32
+    assert len(cards.skins_card(p)["rows"]) == 32
+    review = build_review(replay_bytes, "1234567890123456")
+    target = review["players"][0]
+    target["rounds"] = [{**target["rounds"][0], "round": i} for i in range(1, 41)]
+    target["chip_events"] = []
+    model = cards.review_card(review, target["uid"])
+    assert len(model["rows"]) == 40
+    assert model["rows"][-1]["title"] == "第 40 轮"
+    assert "下一页" not in render(model)
 
 
 def test_empty_cards_and_invalid_review_player(player, replay_bytes):

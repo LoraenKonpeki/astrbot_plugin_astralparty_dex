@@ -23,7 +23,7 @@ REPLAY_BASE = "https://sereplaycn.feimogames.com/prod/"
 
 def digits(value, label="UID", minimum=4, maximum=11):
     if not re.fullmatch(rf"[0-9]{{{minimum},{maximum}}}", str(value)):
-        raise UserError(f"{label}格式不正确，请查看 /星趴 帮助。")
+        raise UserError(f"{label}格式不正确，请查看 ~星趴 帮助。")
     return str(value)
 
 
@@ -119,7 +119,7 @@ class PartyService:
 
     async def send_code(self, owner, phone):
         if not re.fullmatch(r"1[3-9][0-9]{9}", phone):
-            raise UserError("请输入正确的中国大陆手机号。用法：/星趴 登录 手机号")
+            raise UserError("请输入正确的中国大陆手机号。用法：~星趴 登录 手机号")
         state = self.state(owner)
         async with state.lock:
             now = time.time()
@@ -143,7 +143,7 @@ class PartyService:
             await self.sdk.send_code(phone)
             state.pending = {"phone": phone, "expires": now + 300, "attempts": 0}
         return (
-            "验证码已发送，5 分钟内私聊 /星趴 验证 验证码。\n"
+            "验证码已发送，5 分钟内私聊 ~星趴 验证 验证码。\n"
             "登录查询可能使游戏客户端下线，请先退出游戏。手机号和验证码不会由插件长期保存。"
         )
 
@@ -155,7 +155,7 @@ class PartyService:
             if not pending or pending["expires"] < time.time():
                 state.pending = None
                 raise UserError(
-                    "没有待验证的登录，或验证码流程已过期。请私聊 /星趴 登录 手机号。"
+                    "没有待验证的登录，或验证码流程已过期。请私聊 ~星趴 登录 手机号。"
                 )
             pending["attempts"] += 1
             if pending["attempts"] > 5:
@@ -182,7 +182,7 @@ class PartyService:
                     },
                 )
                 await self._connect(owner, state, ticket.sid)
-            return f"登录成功，已绑定 {state.profile['nick']}（UID {state.profile['uid']}）。\n使用 /星趴 我的 或 /星趴 战绩 查看。"
+            return f"登录成功，已绑定 {state.profile['nick']}（UID {state.profile['uid']}）。\n使用 ~星趴 我的 或 ~星趴 战绩 查看。"
 
     async def _connect(self, owner, state, sid):
         # Caller owns state.lock. Login is globally serialized to avoid handshake bursts.
@@ -211,7 +211,7 @@ class PartyService:
             player = await client.login(sid, owner)
             profile = profile_from_player(player)
             if not profile["uid"]:
-                raise UserError("游戏服务器未返回玩家资料，请稍后私聊 /星趴 刷新。")
+                raise UserError("游戏服务器未返回玩家资料，请稍后私聊 ~星趴 刷新。")
             record = self.store.load(owner)
             record.update(uid=profile["uid"], nick=profile["nick"])
             self.store.save(owner, record)
@@ -225,7 +225,7 @@ class PartyService:
     async def _session(self, owner, state, force=False):
         record = self.store.load(owner)
         if not record:
-            raise UserError("尚未绑定账号，请先私聊 /星趴 登录 手机号。")
+            raise UserError("尚未绑定账号，请先私聊 ~星趴 登录 手机号。")
         if not force and state.client and state.client.alive:
             state.client.last_used = time.monotonic()
             return state.client
@@ -233,7 +233,7 @@ class PartyService:
             state.blocked = True
         if state.blocked and not force:
             raise UserError(
-                "上次连接未成功，请退出游戏后私聊 /星趴 刷新；插件不会自动接管在线账号。"
+                "上次连接未成功，请退出游戏后私聊 ~星趴 刷新；插件不会自动接管在线账号。"
             )
         if state.client:
             await state.client.close()
@@ -310,7 +310,7 @@ class PartyService:
     def status(self, owner):
         record = self.store.load(owner)
         if not record:
-            return "尚未绑定账号。请私聊 /星趴 登录 手机号。"
+            return "尚未绑定账号。请私聊 ~星趴 登录 手机号。"
         state = self.states.get(owner)
         connection = (
             "已连接" if state and state.client and state.client.alive else "未连接"
@@ -318,7 +318,7 @@ class PartyService:
         return (
             f"绑定账号：{record.get('nick') or '待读取资料'}\nUID：{record.get('uid') or '待读取'}\n"
             f"游戏会话：{connection}\n登录凭据：已保存（是否有效需查询时验证）\n"
-            "可私聊 /星趴 刷新，或 /星趴 解绑。"
+            "可私聊 ~星趴 刷新，或 ~星趴 解绑。"
         )
 
     def remember_records(self, owner, conversation, records):
@@ -332,7 +332,7 @@ class PartyService:
         if re.fullmatch(r"[0-9]{1,2}", value):
             cached = self.records.get((owner, conversation))
             if not cached or cached[0] < time.monotonic():
-                raise UserError("战绩序号已过期，请先在当前会话使用 /星趴 战绩。")
+                raise UserError("战绩序号已过期，请先在当前会话使用 ~星趴 战绩。")
             index = int(value)
             if not 1 <= index <= len(cached[1]):
                 raise UserError("战绩序号超出范围，请查看最近一次战绩列表。")

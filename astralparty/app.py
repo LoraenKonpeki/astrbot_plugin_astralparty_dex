@@ -9,7 +9,7 @@ from .help import DETAILS, help_text
 from .service import digits
 
 PRIVATE_COMMANDS = {"登录", "验证", "刷新", "解绑"}
-PRIVATE_MESSAGE = "群聊中不执行登录、验证码或账号变更操作。请私聊机器人，使用 /星趴 登录 手机号；详细说明见 /星趴 帮助 登录。"
+PRIVATE_MESSAGE = "群聊中不执行登录、验证码或账号变更操作。请私聊机器人，使用 ~星趴 登录 手机号；详细说明见 ~星趴 帮助 登录。"
 HELP_WORDS = {"帮助", "help", "-h", "--help"}
 
 
@@ -26,7 +26,7 @@ class PartyApp:
 
     async def execute(self, owner, conversation, private, message):
         parts = message.strip().split()
-        if parts and parts[0].lstrip("/") in {"星趴", "astralparty"}:
+        if parts and parts[0].lstrip("~") in {"星趴", "astralparty"}:
             parts = parts[1:]
         if not parts:
             return Reply(help_text())
@@ -34,7 +34,7 @@ class PartyApp:
         if cmd in HELP_WORDS:
             return Reply(help_text(args[0] if args else ""))
         if cmd not in DETAILS:
-            return Reply("未知指令，请使用 /星趴 帮助 查看指令列表。")
+            return Reply("未知指令，请使用 ~星趴 帮助 查看指令列表。")
         if args and args[0] in HELP_WORDS:
             return Reply(help_text(cmd))
         # Must happen before parsing even missing/malformed credentials, or creating a state.
@@ -57,26 +57,21 @@ class PartyApp:
             p = await self.service.profile(owner, refresh=(cmd == "刷新"))
             return Reply(fmt.profile_text(p), True, cards.profile_card(p))
         if cmd == "战绩":
-            self._arity(cmd, args, 0, 2)
+            self._arity(cmd, args, 0, 1)
             target = args[0] if args else "我的"
-            number = args[1] if len(args) > 1 else 1
             p = (
                 await self.service.profile(owner)
                 if target == "我的"
                 else await self.service.query(owner, target)
             )
-            text = fmt.records_text(p, number)
+            text = fmt.records_text(p)
             self.service.remember_records(owner, conversation, p["recent"])
-            return Reply(text, True, cards.records_card(p, number))
+            return Reply(text, True, cards.records_card(p))
         if cmd in {"对局", "复盘"}:
-            self._arity(cmd, args, 1 if cmd == "对局" else 2, 1 if cmd == "对局" else 3)
+            self._arity(cmd, args, 1 if cmd == "对局" else 2, 1 if cmd == "对局" else 2)
             replay_id = self.service.resolve_replay(owner, conversation, args[0])
             if cmd == "复盘":
                 uid = int(digits(args[1]))
-                number = args[2] if len(args) > 2 else 1
-                # Reject invalid page before downloading.
-                if not str(number).isdigit() or int(number) < 1:
-                    raise UserError("页码必须是正整数。")
             review = await self.service.replay(replay_id)
             if cmd == "对局":
                 cache = self.service.records.get((owner, conversation))
@@ -91,34 +86,19 @@ class PartyApp:
                     cards.match_card(review, metadata),
                 )
             return Reply(
-                fmt.review_text(review, uid, number),
+                fmt.review_text(review, uid),
                 True,
-                cards.review_card(review, uid, number),
+                cards.review_card(review, uid),
             )
         if cmd == "角色":
-            self._arity(cmd, args, 0, 1)
+            self._arity(cmd, args, 0, 0)
             p = await self.service.profile(owner)
-            number = args[0] if args else 1
-            return Reply(fmt.heroes_text(p, number), True, cards.heroes_card(p, number))
+            return Reply(fmt.heroes_text(p), True, cards.heroes_card(p))
         if cmd == "皮肤":
-            self._arity(cmd, args, 0, 2)
-            query, number = "", 1
-            if args:
-                if args[0].isdigit() and len(args[0]) <= 2:
-                    if len(args) > 1:
-                        raise UserError(
-                            "纯页码后不需要其他参数，详细说明见 /星趴 帮助 皮肤。"
-                        )
-                    number = args[0]
-                else:
-                    query = args[0]
-                    number = args[1] if len(args) > 1 else 1
+            self._arity(cmd, args, 0, 1)
+            query = args[0] if args else ""
             p = await self.service.profile(owner)
-            return Reply(
-                fmt.skins_text(p, query, number),
-                True,
-                cards.skins_card(p, query, number),
-            )
+            return Reply(fmt.skins_text(p, query), True, cards.skins_card(p, query))
         return Reply(help_text())
 
     @staticmethod

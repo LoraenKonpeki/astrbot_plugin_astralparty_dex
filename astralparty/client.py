@@ -49,7 +49,7 @@ class GameClient:
                 self.downsn = data["downsn"] or self.downsn
                 if data["cmd_id"] == KICK_CMD:
                     raise SessionConflict(
-                        "游戏会话已被服务器结束，可能已在其他客户端登录。请退出游戏后私聊 /星趴 刷新。"
+                        "游戏会话已被服务器结束，可能已在其他客户端登录。请退出游戏后私聊 ~星趴 刷新。"
                     )
                 # UPSN=0 is a push, even when CMDID equals a pending response type.
                 future = self._pending.get(data["upsn"]) if data["upsn"] else None
@@ -104,7 +104,7 @@ class GameClient:
                 # Errors can use a different CMDID; only decode successful expected responses.
                 if data["err"] == 10020:
                     raise SessionConflict(
-                        "账号已在其他客户端在线。插件未自动重试；请退出游戏后私聊 /星趴 刷新。"
+                        "账号已在其他客户端在线。插件未自动重试；请退出游戏后私聊 ~星趴 刷新。"
                     )
                 if data["err"] == 10012:
                     raise UserError(
