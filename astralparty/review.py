@@ -11,7 +11,7 @@
 · cond 是本局累计 → 每轮数据 = 本轮末快照 − 上轮末快照
 · 死亡 = 该轮 total_die / selfDie 增量 > 0
 · 残轮（击败 BOSS 即结束）属正常情况，不产生告警
-· 筹码来源三条路：同帧多人=任务 / 单独=升星 / buyRelicNum 增长帧=商店
+· 来源区分任务、升星、商店与额外获取；来源不明时不按持有筹码强行归因
 """
 
 from __future__ import annotations
@@ -35,6 +35,7 @@ SOURCE_TEXT = {
     "star": "升星",
     "shop": "商店购买",
     "cycle": "循环往复",
+    "extra": "额外获取（来源待确认）",
     "unknown": "未知",
 }
 SOURCE_ICON = {"task": "🎯", "star": "⭐", "shop": "🛒", "cycle": "🔁", "unknown": "❓"}
@@ -155,9 +156,6 @@ def _shop_purchases(rp, uid, chips, groups=None):
     return out
 
 
-CYCLE_CHIP = 50083  # 循环往复：会让玩家单独再拿一个筹码（不是升星/任务）
-
-
 def _level_ups(rp, uid):
     """{帧号: 升到的新等级} —— 该帧发生了升级（= 第 N 次升星，等级从 0 起）"""
     lvs = _hero_lv(rp, uid)
@@ -191,9 +189,14 @@ def _offer_events(rp, uid):
     并且：5249 的价格 = 紧随其后那个事件的价格（商店来源直接取它，不再猜品质）
     """
     evs, cur, pending = [], None, None
+    seen = set()
     for p in rp.packets:
         if p.uid != uid:
             continue
+        identity = (p.cmd, p.sn, p.payload)
+        if p.sn and identity in seen:
+            continue
+        seen.add(identity)
         if p.cmd == BUY_CMD:
             pending = (buy_cost(p.payload).get("relic"), p.frame)  # 连帧号一起记
             continue
@@ -222,8 +225,7 @@ def _offer_events(rp, uid):
             }
             evs.append(cur)
             pending = None
-        if not any(g["cands"] == opts for g in cur["chain"]):
-            cur["chain"].append({"cands": opts, "lv": key[0], "supLv": key[1]})
+        cur["chain"].append({"cands": opts, "lv": key[0], "supLv": key[1]})
     return evs
 
 
@@ -236,46 +238,77 @@ def _round_at(rp, uid, frame):
     return None
 
 
+def _split_acquisitions(offers, chips):
+    """One terminal candidate group per acquired chip; never reuse a refresh chain."""
+    assignments = {}
+    for offer in sorted(
+        offers,
+        key=lambda o: (
+            min((abs(o["frame"] - f) for f in chips.values()), default=999),
+            o["ord"],
+        ),
+    ):
+        ends = {}
+        for cid, frame in chips.items():
+            if cid in assignments or abs(offer["frame"] - frame) > 2:
+                continue
+            hits = [
+                i for i, group in enumerate(offer["chain"]) if cid in group["cands"]
+            ]
+            if hits:
+                ends.setdefault(hits[-1], []).append(cid)
+        start = 0
+        for end, candidates in sorted(ends.items()):
+            if len(candidates) != 1:
+                # A shared terminal group cannot prove which acquisition it belongs to.
+                start = end + 1
+                continue
+            cid = candidates[0]
+            part = {**offer, "chain": offer["chain"][start : end + 1], "part": start}
+            if part["chain"]:
+                assignments[cid] = part
+            start = end + 1
+    return assignments
+
+
+def _extra_candidates(rp, uid, frame, chips):
+    """Hints are evidence candidates, not assertions based solely on chip ownership."""
+    hints = []
+    for cid, label in [(50083, "循环往复"), (50067, "彩羽手环")]:
+        if cid in chips and chips[cid] < frame:
+            hints.append(label)
+    for fr in rp.frames[max(0, frame - 2) : frame + 1]:
+        for player in fr["room"].players:
+            if player.id == uid and player.hero.hero_id == 108:
+                if any(
+                    buff.buff_id == 1081201 and buff.progress >= 25
+                    for buff in player.hero.buffs.values()
+                ):
+                    hints.append("米米潜能（计数达到25）")
+    return list(dict.fromkeys(hints))
+
+
 def _player_chip_events(rp, uid, chips, all_groups):
     ups = _level_ups(rp, uid)
     flips = _mission_flips(rp)
     all_mids = sorted({m for st in rp.mission_states() for m in st})
-    has_cycle = CYCLE_CHIP in chips
-    cycle_frame = chips.get(CYCLE_CHIP)
     offers = _offer_events(rp, uid)
-    claimed = {}  # 已被哪个事件认领（判断循环往复）
-    used = {}  # 已被哪次升级/哪个任务认领（判断循环往复）
+    assignments = _split_acquisitions(offers, chips)
+    claimed = {}  # 已被哪个独立候选段认领
+    used = {}  # 已被哪次升级/哪个任务认领
     shop_price = 10  # 第 n 次商店购买的预期价：10,15,20,25…
     task_taken = {}  # {翻转帧: [已分配出去的任务ID]}（同帧多任务按序分配）
     events = []
 
-    def _ev_ord(cid, f):
-        """该筹码所属事件的时间序号（用于让分配/展示顺序都跟事件走）"""
-        best, bd = 9999, None
-        for o in offers:
-            if abs(o["frame"] - f) > 2:
-                continue
-            if not any(cid in g["cands"] for g in o["chain"]):
-                continue
-            d = abs(o["frame"] - f)
-            if bd is None or d < bd:
-                best, bd = o["ord"], d
-        return best
-
-    _order = {cid: _ev_ord(cid, f) for cid, f in chips.items()}
-    for cid, f in sorted(chips.items(), key=lambda kv: (kv[1], _order[kv[0]])):
-        # ① 出自哪个「事件」（记录帧通常 = 到手帧 或 前后一帧）
-        #    轮次一律取【事件所在轮】：轮末的三选一/商店，筹码背包登记会晚一帧
-        #    甚至跨到下一轮，若用登记帧的轮次会出现「第7轮下面挂着第6轮的筹码」
-        ev, dist = None, None
-        for o in offers:
-            if abs(o["frame"] - f) > 2:
-                continue
-            if not any(cid in g["cands"] for g in o["chain"]):
-                continue
-            d = abs(o["frame"] - f)
-            if dist is None or d < dist:
-                ev, dist = o, d
+    for cid, f in sorted(
+        chips.items(),
+        key=lambda kv: (
+            kv[1],
+            assignments.get(kv[0], {}).get("ord", 9999),
+            assignments.get(kv[0], {}).get("part", 0),
+        ),
+    ):
+        ev = assignments.get(cid)
         rnd = _round_at(rp, uid, ev["frame"] if ev is not None else f)
         # ② 刷新链 = 该事件自己的候选组；选中的筹码只标在最后那一组（避免刷新前的同名也标为选中）
         chain = []
@@ -296,7 +329,7 @@ def _player_chip_events(rp, uid, chips, all_groups):
         opts = pick_grp["cands"] if pick_grp else []
         # ③ 来源判定 + 括号里的参数
         arg = None
-        claim = (ev["frame"], ev["key"]) if ev is not None else None
+        claim = (ev["ord"], ev.get("part", 0)) if ev is not None else None
         lv_now = ups.get(f) or ups.get(f - 1)
         n_players = (
             sum(1 for u, g2 in all_groups.items() if ev["frame"] in g2) if ev else 0
@@ -345,19 +378,15 @@ def _player_chip_events(rp, uid, chips, all_groups):
         elif lv_now and not reused:
             source, arg = "star", lv_now
             key2 = ("star", lv_now)
-        elif reused and has_cycle:
-            source = "cycle"  # 同一次升级/任务已发过一个 ⇒ 这个是循环往复给的
-            arg = None  # 循环往复没有编号，不携带任务号
+        elif reused:
+            source = "extra"  # Independent extra acquisition; require evidence to attribute it.
+            arg = None  # 额外获取不携带猜测的任务或星级编号
             key2 = None
         elif n_players >= 2:
             source = "task"  # 同帧多人拿到（没找到任务翻转也要标任务）
             key2 = None
         elif chain:
-            source = (
-                "cycle"
-                if (has_cycle and cycle_frame is not None and f > cycle_frame)
-                else "star"
-            )
+            source = "extra"
             key2 = None
         else:
             source = "unknown"
@@ -374,6 +403,9 @@ def _player_chip_events(rp, uid, chips, all_groups):
                 "round": rnd,
                 "frame": f,
                 "source": source,
+                "source_candidates": _extra_candidates(rp, uid, f, chips)
+                if source == "extra"
+                else [],
                 "arg": arg,
                 "evi": ev["ord"]
                 if ev is not None

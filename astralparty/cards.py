@@ -275,6 +275,10 @@ def review_event(event, task_names=None):
     from .replay import chip_name, chip_quality
 
     source = SOURCE_TEXT.get(event.get("source"), "未知")
+    if event.get("source_candidates"):
+        source += " · 可能来源：" + " / ".join(
+            clean(name) for name in event["source_candidates"]
+        )
     arg = event.get("arg")
     if arg is not None:
         task = (
