@@ -9,6 +9,10 @@ from .paths import asset
 from .profile import HERO, map_name
 from .review import SOURCE_TEXT
 
+REVIEW_TEMPLATE = asset("assets", "templates", "review.html").read_text(
+    encoding="utf-8"
+)
+
 CARD_TEMPLATE = asset("assets", "templates", "card.html").read_text(encoding="utf-8")
 
 
@@ -246,66 +250,129 @@ def match_card(review, metadata=None):
             ("轮次", review["rounds"]),
         ),
         footer="统计由回放快照推导；缺失名次如实显示为未知。",
-        tip=f"逐轮复盘：~星趴 复盘 {review['replay_id']} 玩家UID",
+        tip=f"逐轮复盘：~星趴 复盘 {review['replay_id']}",
     )
 
 
-def review_card(review, uid):
-    target = next((p for p in review["players"] if p["uid"] == uid), None)
-    if target is None:
-        raise UserError("该 UID 不在这局回放中，请先使用 ~星趴 对局 回放号 查看玩家。")
-    rounds = {r["round"]: r for r in target["rounds"]}
-    for event in target["chip_events"]:
-        rounds.setdefault(event.get("round") or 0, None)
-    values = sorted(rounds)
-    items = []
-    for rnd in values:
-        r = rounds[rnd]
-        stats = (
-            metrics(
-                ("击杀", r["kill"]),
-                ("伤害", r["dmg"]),
-                ("承伤", r["inj"]),
-                ("星币", r["gold"]),
-                ("步数", r["move"]),
-            )
-            if r
-            else []
+@lru_cache(maxsize=256)
+def chip_icon(chip_id):
+    try:
+        chip_id = int(chip_id)
+    except (TypeError, ValueError):
+        return ""
+    if not 50001 <= chip_id <= 59999:
+        return ""
+    try:
+        raw = asset("assets", "chips", f"{chip_id}.png").read_bytes()
+    except OSError:
+        return ""
+    if not raw.startswith(b"\x89PNG\r\n\x1a\n"):
+        return ""
+    return "data:image/png;base64," + base64.b64encode(raw).decode("ascii")
+
+
+def review_event(event, task_names=None):
+    from .replay import chip_name, chip_quality
+
+    source = SOURCE_TEXT.get(event.get("source"), "未知")
+    arg = event.get("arg")
+    if arg is not None:
+        task = (
+            (task_names or {}).get(str(arg), "")
+            if event.get("source") == "task"
+            else ""
         )
-        details = []
-        for e in (e for e in target["chip_events"] if (e.get("round") or 0) == rnd):
-            details.append(
+        source += f" · {arg}" + (f" · {clean(task)}" if task else "")
+    chain = event.get("chain") or [
+        {
+            "cands": event.get("candidates", []),
+            "names": event.get("candidates_name", []),
+            "picked": event.get("picked_index", -1),
+        }
+    ]
+    groups = []
+    for index, group in enumerate(chain):
+        ids, names = group.get("cands", []), group.get("names", [])
+        candidates = []
+        for i in range(max(len(ids), len(names))):
+            cid = ids[i] if i < len(ids) else 0
+            candidates.append(
                 {
-                    "label": clean(e["name"]),
-                    "value": f"来源：{SOURCE_TEXT.get(e['source'], '未知')} · 刷新 {e.get('refresh', 0)} 次",
+                    "name": clean(names[i] if i < len(names) else chip_name(cid)),
+                    "icon": chip_icon(cid),
+                    "quality": chip_quality(cid),
+                    "picked": i == group.get("picked", -1),
                 }
             )
-            if e.get("candidates_name"):
-                details.append(
-                    {
-                        "label": "候选",
-                        "value": " / ".join(clean(c) for c in e["candidates_name"]),
-                    }
-                )
-            details.append({"label": "选中", "value": clean(e["name"])})
-        items.append(
-            row(
-                f"第 {rnd} 轮" if rnd else "开局 / 轮次未知",
-                badge="本轮阵亡" if r and r["died"] else "",
-                metrics=stats,
-                details=details,
+        if candidates:
+            groups.append(
+                {
+                    "label": "初始候选" if index == 0 else f"刷新 {index}",
+                    "candidates": candidates,
+                }
             )
+    return {
+        "name": clean(event.get("name") or chip_name(event.get("id", 0))),
+        "icon": chip_icon(event.get("id", 0)),
+        "quality": event.get("quality", ""),
+        "source": source,
+        "refresh": event.get("refresh", 0),
+        "price": event.get("price"),
+        "groups": groups,
+    }
+
+
+def review_card(review):
+    players = sorted(review["players"], key=lambda p: p.get("slot", 0))
+    rounds = set(range(1, int(review.get("rounds") or 0) + 1))
+    indexed = []
+    headers = []
+    for player in players:
+        stats = {r["round"]: r for r in player["rounds"]}
+        events = {}
+        for event in player["chip_events"]:
+            events.setdefault(event.get("round") or 0, []).append(
+                review_event(event, review.get("task_names"))
+            )
+        rounds.update(stats)
+        rounds.update(events)
+        indexed.append((stats, events))
+        headers.append(
+            {
+                "nick": clean(player["nick"]),
+                "uid": player["uid"],
+                "hero": HERO.get(player["hero_id"], f"角色#{player['hero_id']}"),
+                "avatar": pixel(player["hero_id"]),
+                "totals": player.get("totals") or {},
+                "chips": [
+                    {
+                        "name": clean(c["name"]),
+                        "icon": chip_icon(c["id"]),
+                        "quality": c.get("quality", ""),
+                    }
+                    for c in player["chips"]
+                ],
+            }
         )
-    return card(
-        f"{clean(target['nick'])} · 逐轮复盘",
-        f"UID {uid} · {HERO.get(target['hero_id'], '未知角色')} · 回放 {review['replay_id']}",
-        "ROUND TIMELINE",
-        avatar=pixel(target["hero_id"]),
-        section="战况与筹码",
-        rows=items,
-        layout="grid",
-        footer="逐轮统计与筹码来源由回放推导，可能存在未知项。",
-    )
+    return {
+        "kind": "review",
+        "width": 1440,
+        "replay_id": review["replay_id"],
+        "map": map_name(review.get("map_id")) or "地图未知",
+        "difficulty": review.get("difficulty") or "未知",
+        "rounds": review.get("rounds", 0),
+        "players": headers,
+        "timeline": [
+            {
+                "round": rnd,
+                "cells": [
+                    {"stats": stats.get(rnd), "events": events.get(rnd, [])}
+                    for stats, events in indexed
+                ],
+            }
+            for rnd in sorted(rounds)
+        ],
+    }
 
 
 def text_card(text):

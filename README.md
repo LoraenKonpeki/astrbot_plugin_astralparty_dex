@@ -44,7 +44,7 @@ https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex
 | `~星趴 我的` | 个人档案、累计场次、胜场、胜率和获赞 | 需要绑定 |
 | `~星趴 战绩 [UID或我的]` | 最近最多 10 局，默认自己 | 全部记录合并为一张图；UID 查询需要自己的登录态 |
 | `~星趴 对局 回放号或序号` | 单局玩家与战况统计 | 直接按回放号无需绑定 |
-| `~星趴 复盘 回放号或序号 玩家UID` | 逐轮战况、筹码来源、选择和刷新 | 全部轮次合并为一张图；直接按回放号无需绑定 |
+| `~星趴 复盘 回放号或序号` | 整局四人逐轮战况、筹码来源、候选刷新链和选择 | 全部轮次合并为一张图；直接按回放号无需绑定 |
 | `~星趴 角色` | 自己的角色使用排行、PVE 等级和潜能 | 全部已拥有角色 |
 | `~星趴 皮肤 [角色名或角色ID]` | 自己的皮肤与契约状态 | 全部已拥有角色；可按角色筛选 |
 
@@ -58,7 +58,7 @@ https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex
 ~星趴 战绩 1234567
 ~星趴 对局 1
 ~星趴 对局 1234567890123456
-~星趴 复盘 1 1234567
+~星趴 复盘 1
 ~星趴 角色
 ~星趴 皮肤 101
 ~星趴 皮肤 帕露南
@@ -112,6 +112,8 @@ replays/*.bin         # 公共回放缓存
 
 ![全部皮肤卡片](docs/previews/skins.png)
 
+![四人整局复盘](docs/previews/review.png)
+
 开发预览使用合成数据：`python scripts/preview_cards.py`，生成的 HTML 位于 `output/playwright/`。
 
 ## 配置
@@ -151,3 +153,7 @@ python -m pytest -q
 插件采用 MIT 许可，详见 [LICENSE](LICENSE)。协议编解码、描述符加载、回放/复盘解析、角色皮肤解析、静态表及 SDK 签名常量移植或参考了 [AstralParty_Dex](https://github.com/ZtyanCrany/AstralParty_Dex)，保留上游作者 Nemophila & ZtyanCrany 的许可，见 [licenses/AstralParty_Dex-MIT.txt](licenses/AstralParty_Dex-MIT.txt)。
 
 本插件与游戏开发方、运营方无关联。游戏协议、名称和数据的相关权利属于原权利方；像素角色素材来自用户指定的 [StarEngine_Picture_Resources](https://github.com/LoraenKonpeki/StarEngine_Picture_Resources)，素材权利属于原权利方，不因插件代码采用 MIT 而改变。附带的签名常量来自上游公开项目，不是用户登录凭据。请遵循上游的学习研究用途说明，避免商业用途与大规模数据抓取。
+
+整局复盘只需要 `~星趴 复盘 回放号`，按轮次 × 玩家并排展示全局。沿用参考客户端的事件轮次归属、刷新链和最终选择标记，不把刷新前出现的同名筹码误标为已选。候选或统计缺失时会标明，不据此推断没有操作。
+
+筹码图标来自 [吉星派对 BWIKI 筹码页](https://wiki.biligame.com/starengine/筹码)，本地内置并按 ID/页面名称核对映射；当前附带筹码表中的 89 项全部有对应图标。原文件名、下载地址和 SHA-256 见 [筹码来源清单](assets/chips/source.json)。素材权利属于原权利方，插件代码的 MIT 不适用于游戏美术。未知筹码保留名称/编号占位，渲染无需访问外部图片服务器。

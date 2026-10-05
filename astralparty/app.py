@@ -6,7 +6,6 @@ from . import cards
 from . import formatting as fmt
 from .errors import UserError
 from .help import DETAILS, help_text
-from .service import digits
 
 PRIVATE_COMMANDS = {"登录", "验证", "刷新", "解绑"}
 PRIVATE_MESSAGE = "群聊中不执行登录、验证码或账号变更操作。请私聊机器人，使用 ~星趴 登录 手机号；详细说明见 ~星趴 帮助 登录。"
@@ -68,10 +67,8 @@ class PartyApp:
             self.service.remember_records(owner, conversation, p["recent"])
             return Reply(text, True, cards.records_card(p))
         if cmd in {"对局", "复盘"}:
-            self._arity(cmd, args, 1 if cmd == "对局" else 2, 1 if cmd == "对局" else 2)
+            self._arity(cmd, args, 1, 1)
             replay_id = self.service.resolve_replay(owner, conversation, args[0])
-            if cmd == "复盘":
-                uid = int(digits(args[1]))
             review = await self.service.replay(replay_id)
             if cmd == "对局":
                 cache = self.service.records.get((owner, conversation))
@@ -86,9 +83,9 @@ class PartyApp:
                     cards.match_card(review, metadata),
                 )
             return Reply(
-                fmt.review_text(review, uid),
+                fmt.review_text(review),
                 True,
-                cards.review_card(review, uid),
+                cards.review_card(review),
             )
         if cmd == "角色":
             self._arity(cmd, args, 0, 0)

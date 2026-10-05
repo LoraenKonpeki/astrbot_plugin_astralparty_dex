@@ -8,7 +8,7 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
 
 from .astralparty.app import PartyApp
-from .astralparty.cards import CARD_TEMPLATE, text_card
+from .astralparty.cards import CARD_TEMPLATE, REVIEW_TEMPLATE, text_card
 from .astralparty.errors import UserError
 from .astralparty.formatting import split_text
 from .astralparty.service import PartyService
@@ -19,7 +19,7 @@ from .astralparty.store import owner_key
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.2.1",
+    "0.3.0",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
@@ -64,12 +64,17 @@ class AstralPartyPlugin(Star):
                     visual = reply.visual or text_card(reply.text)
                     image = await asyncio.wait_for(
                         self.html_render(
-                            CARD_TEMPLATE,
+                            REVIEW_TEMPLATE
+                            if visual.get("kind") == "review"
+                            else CARD_TEMPLATE,
                             {"card": visual},
                             return_url=False,
                             options={
                                 "full_page": True,
-                                "viewport": {"width": 860, "height": 600},
+                                "viewport": {
+                                    "width": visual.get("width", 860),
+                                    "height": 600,
+                                },
                             },
                         ),
                         timeout=45,

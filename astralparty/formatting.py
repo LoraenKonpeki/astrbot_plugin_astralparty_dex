@@ -4,7 +4,6 @@ from datetime import datetime, timezone, timedelta
 
 from .errors import UserError
 from .profile import HERO, map_name
-from .review import SOURCE_TEXT
 
 TZ = timezone(timedelta(hours=8))
 
@@ -127,43 +126,59 @@ def match_text(review, metadata=None):
         )
     lines += [
         "统计根据回放快照推导；名次缺失时不推测。",
-        f"逐轮复盘：~星趴 复盘 {review['replay_id']} 玩家UID",
+        f"逐轮复盘：~星趴 复盘 {review['replay_id']}",
     ]
     return "\n".join(lines)
 
 
-def review_text(review, uid):
-    target = next((p for p in review["players"] if p["uid"] == uid), None)
-    if target is None:
-        raise UserError("该 UID 不在这局回放中，请先使用 ~星趴 对局 回放号 查看玩家。")
-    # Include event-only rounds and opening events whose recorded round is zero/unknown.
-    events = target["chip_events"]
-    rounds = {r["round"]: r for r in target["rounds"]}
-    for e in events:
-        rounds.setdefault(e.get("round") or 0, None)
-    rows = sorted(rounds)
+def review_text(review):
+    from .cards import review_event
+
     lines = [
-        f"逐轮复盘 · {clean(target['nick'])} · UID {uid}",
-        f"回放 {review['replay_id']} · 共 {len(rows)} 个轮次记录",
+        f"整局复盘 · 回放 {review['replay_id']}",
+        f"{map_name(review.get('map_id')) or '地图未知'} · 共 {review['rounds']} 轮",
     ]
-    if not rows:
-        lines.append("回放缺少逐轮记录。")
-    for rnd in rows:
-        row = rounds[rnd]
-        lines.append(f"第 {rnd} 轮" if rnd else "开局/轮次未知")
-        if row:
-            lines.append(
-                f"击杀 {row['kill']} · 伤害 {row['dmg']} · 承伤 {row['inj']}\n星币 {row['gold']} · 步数 {row['move']} · {'本轮阵亡' if row['died'] else '无阵亡记录'}"
+    for player in sorted(review["players"], key=lambda p: p.get("slot", 0)):
+        lines.append(
+            f"\n{clean(player['nick'])} · UID {player['uid']} · {HERO.get(player['hero_id'], '未知角色')}"
+        )
+        rounds = {r["round"]: r for r in player["rounds"]}
+        events = {}
+        for event in player["chip_events"]:
+            events.setdefault(event.get("round") or 0, []).append(
+                review_event(event, review.get("task_names"))
             )
-        for e in (e for e in events if (e.get("round") or 0) == rnd):
-            candidates = " / ".join(clean(c) for c in e.get("candidates_name", []))
-            lines.append(
-                f"筹码：{clean(e['name'])} · 来源 {SOURCE_TEXT.get(e['source'], '未知')} · 刷新 {e.get('refresh', 0)} 次"
-            )
-            if candidates:
-                lines.append(f"候选：{candidates}")
-            lines.append(f"选中：{clean(e['name'])}")
-    lines.append("筹码来源根据回放推导，可能存在未知项。")
+        for rnd in sorted(
+            set(rounds) | set(events) | set(range(1, int(review["rounds"]) + 1))
+        ):
+            lines.append(f"第 {rnd} 轮" if rnd else "开局 / 轮次未知")
+            row = rounds.get(rnd)
+            if row:
+                lines.append(
+                    f"击杀 {row['kill']} · 伤害 {row['dmg']} · 承伤 {row['inj']} · 星币 {row['gold']} · 步数 {row['move']}"
+                    + (" · 本轮阵亡" if row["died"] else "")
+                )
+            else:
+                lines.append("无该轮统计记录。")
+            for event in events.get(rnd, []):
+                lines.append(
+                    f"筹码：{event['name']} · 来源 {event['source']} · 刷新 {event['refresh']} 次"
+                )
+                if event["price"] is not None:
+                    lines.append(f"购买价格：{event['price']}")
+                for group in event["groups"]:
+                    lines.append(
+                        group["label"]
+                        + "："
+                        + " / ".join(
+                            c["name"] + ("（选中）" if c["picked"] else "")
+                            for c in group["candidates"]
+                        )
+                    )
+                if not event["groups"]:
+                    lines.append("未留下候选记录。")
+                lines.append(f"获得：{event['name']}")
+    lines.append("轮次数据与筹码来源由回放推导；无记录不代表未操作。")
     return "\n".join(lines)
 
 

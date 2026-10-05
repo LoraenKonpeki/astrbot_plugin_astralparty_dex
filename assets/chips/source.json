@@ -1,0 +1,474 @@
+{
+  "page": "https://wiki.biligame.com/starengine/筹码",
+  "retrieved": "2026-10-05",
+  "files": {
+    "50001": {
+      "file": "UT Relic Attack.png",
+      "name": "拳击手套-初级",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/21/pmugivjpvmp9ch9chckbsb07e8aeyft.png",
+      "sha256": "b110705d12988b338b911b01d8c95ea260892ec7fcda0328718b3c4e064ed581"
+    },
+    "50002": {
+      "file": "UT Relic Attack.png",
+      "name": "拳击手套-中级",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/21/pmugivjpvmp9ch9chckbsb07e8aeyft.png",
+      "sha256": "b110705d12988b338b911b01d8c95ea260892ec7fcda0328718b3c4e064ed581"
+    },
+    "50003": {
+      "file": "UT Relic Attack.png",
+      "name": "拳击手套-高级",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/21/pmugivjpvmp9ch9chckbsb07e8aeyft.png",
+      "sha256": "b110705d12988b338b911b01d8c95ea260892ec7fcda0328718b3c4e064ed581"
+    },
+    "50004": {
+      "file": "UT Relic Speed.png",
+      "name": "速度轮滑-初级",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/d3/amcqytzt6hw7sanqj0hkl1ujijxq4sg.png",
+      "sha256": "c1b6116afda9815d4bb836feb101317d1345bdcbf5324696e7dc15da6a798506"
+    },
+    "50005": {
+      "file": "UT Relic Speed.png",
+      "name": "速度轮滑-中级",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/d3/amcqytzt6hw7sanqj0hkl1ujijxq4sg.png",
+      "sha256": "c1b6116afda9815d4bb836feb101317d1345bdcbf5324696e7dc15da6a798506"
+    },
+    "50006": {
+      "file": "UT Relic Speed.png",
+      "name": "速度轮滑-高级",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/d3/amcqytzt6hw7sanqj0hkl1ujijxq4sg.png",
+      "sha256": "c1b6116afda9815d4bb836feb101317d1345bdcbf5324696e7dc15da6a798506"
+    },
+    "50007": {
+      "file": "UT Relic Hp.png",
+      "name": "夹心饼干-一般",
+      "url": "https://patchwiki.biligame.com/images/starengine/7/75/fd9mvfdpdzpnpsjoy2u3c60zx1qazvp.png",
+      "sha256": "aaa3c0b4ae8ddd44d42e69bde9c7960324f5d801c39ed85b7cfcd944b60bfba4"
+    },
+    "50008": {
+      "file": "UT Relic Hp.png",
+      "name": "夹心饼干-可口",
+      "url": "https://patchwiki.biligame.com/images/starengine/7/75/fd9mvfdpdzpnpsjoy2u3c60zx1qazvp.png",
+      "sha256": "aaa3c0b4ae8ddd44d42e69bde9c7960324f5d801c39ed85b7cfcd944b60bfba4"
+    },
+    "50009": {
+      "file": "UT Relic Hp.png",
+      "name": "夹心饼干-美味",
+      "url": "https://patchwiki.biligame.com/images/starengine/7/75/fd9mvfdpdzpnpsjoy2u3c60zx1qazvp.png",
+      "sha256": "aaa3c0b4ae8ddd44d42e69bde9c7960324f5d801c39ed85b7cfcd944b60bfba4"
+    },
+    "50010": {
+      "file": "UT Relic 50010.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/3/35/gt4cqf5wf23glczg6yn94gujfxtcxa9.png",
+      "sha256": "23e55917b488f290ba3c9f929b83d4f8dfa461f1539308a77d5655ca5f29e3eb"
+    },
+    "50011": {
+      "file": "UT Relic 50010.png",
+      "name": "美工刀-锋利",
+      "url": "https://patchwiki.biligame.com/images/starengine/3/35/gt4cqf5wf23glczg6yn94gujfxtcxa9.png",
+      "sha256": "23e55917b488f290ba3c9f929b83d4f8dfa461f1539308a77d5655ca5f29e3eb"
+    },
+    "50013": {
+      "file": "UT Relic KillReward.png",
+      "name": "手电筒-强光",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/27/dlq45731eyd3ib33d2evynbb0m2ptxq.png",
+      "sha256": "cd8663fd33fb72c0a59651c8d3b0ba473f9038fa7439592db65b32ab3a91d052"
+    },
+    "50015": {
+      "file": "UT Relic Gold.png",
+      "name": "银行卡-余额少",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/91/mlbcrhbb3m8qwx77rlrnrdok0gy2lxp.png",
+      "sha256": "ba475cc30552453ebb11634a3bb8158843e5aadc113a082c2ae44e7cff7dd5c1"
+    },
+    "50016": {
+      "file": "UT Relic Gold.png",
+      "name": "银行卡-余额多",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/91/mlbcrhbb3m8qwx77rlrnrdok0gy2lxp.png",
+      "sha256": "ba475cc30552453ebb11634a3bb8158843e5aadc113a082c2ae44e7cff7dd5c1"
+    },
+    "50017": {
+      "file": "UT Relic Gold.png",
+      "name": "银行卡-用不完",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/91/mlbcrhbb3m8qwx77rlrnrdok0gy2lxp.png",
+      "sha256": "ba475cc30552453ebb11634a3bb8158843e5aadc113a082c2ae44e7cff7dd5c1"
+    },
+    "50018": {
+      "file": "UT Relic Defend.png",
+      "name": "摩托头盔-一般",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/51/6rayaqe63kq53ma5001tmxn2558ema7.png",
+      "sha256": "59b098f167d064c74337ba1101c13f3bf405ee6430986adbc28ca10dc1f56960"
+    },
+    "50019": {
+      "file": "UT Relic Defend.png",
+      "name": "摩托头盔-中级",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/51/6rayaqe63kq53ma5001tmxn2558ema7.png",
+      "sha256": "59b098f167d064c74337ba1101c13f3bf405ee6430986adbc28ca10dc1f56960"
+    },
+    "50020": {
+      "file": "UT Relic Defend.png",
+      "name": "摩托头盔-高级",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/51/6rayaqe63kq53ma5001tmxn2558ema7.png",
+      "sha256": "59b098f167d064c74337ba1101c13f3bf405ee6430986adbc28ca10dc1f56960"
+    },
+    "50021": {
+      "file": "UT Relic Heal.png",
+      "name": "医疗箱-紧急治疗",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/52/5oobqbkycscaf3xeq8i77iafg4rc2m7.png",
+      "sha256": "c667bf0f6afc865bea1fbd74e0a36db6126459706cf792a8f3a4c5d2d84b8ced"
+    },
+    "50022": {
+      "file": "UT Relic Heal.png",
+      "name": "医疗箱-完备治疗",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/52/5oobqbkycscaf3xeq8i77iafg4rc2m7.png",
+      "sha256": "c667bf0f6afc865bea1fbd74e0a36db6126459706cf792a8f3a4c5d2d84b8ced"
+    },
+    "50024": {
+      "file": "UT Relic Enmity.png",
+      "name": "肾上腺素-高效",
+      "url": "https://patchwiki.biligame.com/images/starengine/1/10/n1ciwif18gs26q4beevd8m56x1txy1i.png",
+      "sha256": "287c8abad5890b7a466e226e1cc9786173cc2b1e9fa85b94690b7b6cc8b054e8"
+    },
+    "50025": {
+      "file": "UT Relic 50025.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/6e/bjwv75rcc84wctxazyerobxnrqrtggp.png",
+      "sha256": "891e2770e03763cfcf57ef59991fb15c0661637035e7346751524eb0fea78418"
+    },
+    "50026": {
+      "file": "UT Relic 50026.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/de/dk5uttuszsoz80x70wxbw13auf7piav.png",
+      "sha256": "79675ff71032b89a901784704eb20dd951e46d8a08941f04f31b1c9c71921473"
+    },
+    "50027": {
+      "file": "UT Relic 50027.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/99/etavazm3riil2u7pya6v1h94sorghg7.png",
+      "sha256": "b829de3b12bf8376116bf25eda1098f03db5a771b2e7fc717d0cd6120e7a9121"
+    },
+    "50028": {
+      "file": "UT Relic 50028.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/1/1b/ic8x54z96ot7uudgb33b5922ba079sc.png",
+      "sha256": "c8aeab27793f7bba790908b6fb613f17794421139ea0ed81cc3c7bbe1953c8b7"
+    },
+    "50029": {
+      "file": "UT Relic 50029.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/e/e9/i3ld9j7cetpwlz798464k4a0ayjn5js.png",
+      "sha256": "dce8fe532e3082c1b4b583231c2f6e5af87ccd54d207432fbbef93fb847370a6"
+    },
+    "50030": {
+      "file": "UT Relic 50030.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/e/e1/fk9ptjn6cal4zxs1dt5h94o42vmvo29.png",
+      "sha256": "f94b6690229359a0441f2752415ef5db2a47397f98e230cdd7959857557fdb6a"
+    },
+    "50031": {
+      "file": "UT Relic 50031.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/a/af/i3ogwvwbjztfabu4b39wkv2nm33jc46.png",
+      "sha256": "32b99e4469af873d372891c3993d2fa80619f6b323aa9d28fe3c11f5ea04803b"
+    },
+    "50032": {
+      "file": "UT Relic 50032.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/b/bb/t5ulpiv5ab004i6llfw9of0fkw21pri.png",
+      "sha256": "0c131442b9800cc5710aade3898a46cf5000de5e9cc27110b1a8f65ab300aef4"
+    },
+    "50033": {
+      "file": "UT Relic 50033.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/e/e2/38pq1ck11z08f428smhqcqioeosrxfm.png",
+      "sha256": "d18b74654cd841b22ee01e9e9d4a2044f37bab4094bb619b2e46aadbc959b9e7"
+    },
+    "50034": {
+      "file": "UT Relic 50034.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/02/ippkqc8ieph9r89ymj511tu9oiqghty.png",
+      "sha256": "01f07baa0639dfd92a5e219f960263f1e13386ffc12326dee1c1bd603305fc75"
+    },
+    "50035": {
+      "file": "UT Relic 50035.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/96/3uirpeb63cxfr5kgph2d5bdvqxhzwd4.png",
+      "sha256": "061aa1f7ce81b394a609158f01112e8a5075b41c1f3599a85c5484f389ecf1bd"
+    },
+    "50036": {
+      "file": "UT Relic 50036.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/4/41/l9y4occg0cuhfd6gd26s24kovkeuc3i.png",
+      "sha256": "ee30349d176431409594e94a6adb2728e8cd9099bd7a1476129f8480d807f096"
+    },
+    "50037": {
+      "file": "UT Relic 50037.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/a/a4/elwx9ugrdz74krbxrtjd61cvfo6i35s.png",
+      "sha256": "8ed3bca80ac3fcbf64e81407a1c2edb610df868500091a860cb8f4d57c1e802c"
+    },
+    "50038": {
+      "file": "UT Relic 50038.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/84/nsn521jphb1au25hwn9owty0unkxu72.png",
+      "sha256": "bfcc69f18fda11a217c1cf9d47aa78f216148c6c5d619ba49bfdf87175a8ad1b"
+    },
+    "50039": {
+      "file": "UT Relic 50039.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/3/3a/52d1hpwgfn0hbkr4x928ttnnajz94uc.png",
+      "sha256": "569cd8cbcd71d2e1e471a3ba7dc1d81f1b700b548e4279820ea8f2d1d6a7238d"
+    },
+    "50040": {
+      "file": "UT Relic 50040.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/2b/nhxzf6tgyjdbv2xr5xrkktjhs00zknl.png",
+      "sha256": "34af6c0f05940782e6cde8805647c4c5a4c2dbeae51cceec63dcf7ec181fbdf8"
+    },
+    "50041": {
+      "file": "UT Relic 50041.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/54/9uqgeyxnbu0ru30tnunynovpemmjnlj.png",
+      "sha256": "3873250a86758f3075797927409b2c9214b5492b81f99f3faa9a04f6f4362f79"
+    },
+    "50042": {
+      "file": "UT Relic 50042.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/6a/57n13akd798bolbn2n7ej65ssi4z9nr.png",
+      "sha256": "c248d54e7c90aaf50180e7b34b3e773b343764097bde016772cbe3f0a4182fdf"
+    },
+    "50043": {
+      "file": "UT Relic 50043.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/52/oxsyyi5owkqu7al5xe2qwgscgc2sfg6.png",
+      "sha256": "a0f534af10adea42496c8077b8d2a5ee5522da65be7f970b0f1d63f240ca2cc9"
+    },
+    "50044": {
+      "file": "UT Relic 50044.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/5b/qcz0upy3ta780vgug7ldtl50a5wx4u2.png",
+      "sha256": "11362a81f394eb3df79018e7f0dfe40a63f6ff6bdcda477b4ed6530cac7c6240"
+    },
+    "50045": {
+      "file": "UT Relic 50045.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/4/42/qda97oghd5sc2uwystrhporwik1t79m.png",
+      "sha256": "2dedc319b1484cbfee9b559177005e5114a7ea7d0bae5e298ff72b2848cdf6c6"
+    },
+    "50046": {
+      "file": "UT Relic 50046.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/86/gq601xm8zdjx3qw4qclnoxy3pafaxnv.png",
+      "sha256": "81cc3c83d059fd347fe04f229cf3e3f42dd3224c43bcbfdf1dccc323f53fe8d8"
+    },
+    "50047": {
+      "file": "UT Relic 50047.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/c/ce/48qzi4qg3tu58urn025wl57r5zi9ob5.png",
+      "sha256": "e5793cfdea73f6dd229dd5d03f1a96b3f106c2b353e88da474c7bf64570efb87"
+    },
+    "50048": {
+      "file": "UT Relic 50030.png",
+      "name": "手持风扇-大",
+      "url": "https://patchwiki.biligame.com/images/starengine/e/e1/fk9ptjn6cal4zxs1dt5h94o42vmvo29.png",
+      "sha256": "f94b6690229359a0441f2752415ef5db2a47397f98e230cdd7959857557fdb6a"
+    },
+    "50049": {
+      "file": "UT Relic 50049.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/80/fw22h0ycr7wwruvib2skoqbz2byo386.png",
+      "sha256": "485cef14b889c00e67b5474e08702388b79cf147ad058b6b71bc2d1e0856bcc2"
+    },
+    "50050": {
+      "file": "UT Relic 50050.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/f/ff/qtsb43zvcxnh1g8ap698bf1kyctpw5v.png",
+      "sha256": "a39c15a5b1725c28c59da093937a6e91d7aa0a1ecd52744c892615726ca3de1e"
+    },
+    "50051": {
+      "file": "UT Relic 50051.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/66/fy3by5aqy5xjvxfsyk6nbsfsa8e18uy.png",
+      "sha256": "6def3fe6f5bbfebd051e9bca62f9d13e5a366d66d07fa9d376420fb544835c1d"
+    },
+    "50052": {
+      "file": "UT Relic 50044.png",
+      "name": "普通瞄具",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/5b/qcz0upy3ta780vgug7ldtl50a5wx4u2.png",
+      "sha256": "11362a81f394eb3df79018e7f0dfe40a63f6ff6bdcda477b4ed6530cac7c6240"
+    },
+    "50053": {
+      "file": "UT Relic 50053.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/63/b2qbpwqzcntz411x7swrild241q0kj7.png",
+      "sha256": "45486e24f772953153d0efbd42596f55ec00eb83c52273124f5c92cc75241d75"
+    },
+    "50054": {
+      "file": "UT Relic 50054.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/a/a9/tlthrsd4jfx4issi6b14obnm51t6a7o.png",
+      "sha256": "4df3b84f29f1110aa78b71a6126090fe3291be923954e12fba64824c968b2e6c"
+    },
+    "50055": {
+      "file": "UT Relic 50055.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/3/3b/86452lf2t9s841lb17i6fwmsf135eaw.png",
+      "sha256": "dee0f991e1e5377811a28536773781d6a97d7c67e571f0dd3d823fc2710108e7"
+    },
+    "50056": {
+      "file": "UT Relic 50056.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/4/42/a1faxw4sovaiqx8ybrw7hwfhqz3benw.png",
+      "sha256": "096351b3b884bc2308b97ba9f6200365472d8b44911a037054eafd660794f85f"
+    },
+    "50057": {
+      "file": "UT Relic 50057.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/b/b4/5htfzx40d21dis73vc7t3lwpapeiu56.png",
+      "sha256": "4ef07988c900df5ba0b9be5ee6b826f53d94d7e39cc0eeaedb006cb429b8ac0b"
+    },
+    "50058": {
+      "file": "UT Relic 50058.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/1/14/pytqm65uulgqngwjdf4plv0cq3pjoq0.png",
+      "sha256": "b0a8a33850ae441bacbdffd3be1ab7705f64f4957a41e296ca0a7eb2e5f05dac"
+    },
+    "50059": {
+      "file": "UT Relic 50059.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/a/a2/hvnk7zbqpe8mltc59webati35j5gyo7.png",
+      "sha256": "992c75da702f708ee44d0b262e8e9d291bb3461588f8969f67dbbee797c9ebbf"
+    },
+    "50060": {
+      "file": "UT Relic 50060.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/07/r2izfibf7v8old2jgp3vohnysx5la22.png",
+      "sha256": "c72d57a9bdfbd2c04fcd74d4f1fb919f1d943cb06afb82c1ce2ff7ab7e832624"
+    },
+    "50061": {
+      "file": "UT Relic 50061.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/1/1c/dv8uz49rri0jps1y6x1wdawaae1h4s1.png",
+      "sha256": "c5b32ac0ae7b2d3bbcba453519c62d6e076f6adfe9551b898144044d81d6bf8a"
+    },
+    "50062": {
+      "file": "UT Relic 50062.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/64/1qj85r40u1k4pcfkx6v5o7ncxoantc0.png",
+      "sha256": "484a7ad26493694d58cc94b549e15a90b947714f1a55244d3241454c8f087189"
+    },
+    "50063": {
+      "file": "UT Relic 50063.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/4/40/garktsey68jm3r7arpnchculll0ac4t.png",
+      "sha256": "a20f3337fbc17950216f49b20731104122499ec1c260aaff5e84e9f4f62a28cd"
+    },
+    "50064": {
+      "file": "UT Relic 50064.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/0c/7ieau54124jsz06ocrvjaw0kiknkdsz.png",
+      "sha256": "f8a2c3f3bf43f65562c984c0351113e28cdf945c6d81c78c5894831f35b2d2b1"
+    },
+    "50065": {
+      "file": "UT Relic 50065.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/5f/m5duegmeu1j6m7dz97rivlsvi2p2lpe.png",
+      "sha256": "6a40c8ca409ecfe6de8de00bad1d9206ac9bdc7d9410c0df292016713ef83632"
+    },
+    "50066": {
+      "file": "UT Relic 50066.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/50/r2r6h3ds0t08x8hn4lotpho2zxrqkzo.png",
+      "sha256": "6c10be1b09d310901b385657699b8b729963f56dd9dd6a59378d79bbf7182949"
+    },
+    "50067": {
+      "file": "UT Relic 50067.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/9f/gnnr8cm1t7gsdh7jkj2rbqsllrm5ajr.png",
+      "sha256": "2ba8e82da3632c6387fc41f646b737f2bed3665539fea102cba1221b93e54901"
+    },
+    "50068": {
+      "file": "UT Relic 50068.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/d2/3811bez0a3xvkiqhsmu2t3asmyjpg50.png",
+      "sha256": "b3e9974a5827aa269b25a72880152fb511dce43e36ff139297edf23972ee4179"
+    },
+    "50069": {
+      "file": "UT Relic 50069.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/8b/jwksid3bvwbzkufg3vsx6q4vy8pwem7.png",
+      "sha256": "d6f5afab7b132c718b02a8f452f7675cd35942974820824ccdb33631976d38ce"
+    },
+    "50070": {
+      "file": "UT Relic 50070.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/c/c7/59hlzs7mfzy5z038d17un01b9iyereu.png",
+      "sha256": "f36e5cc633e02174d78540e1e04b58841fc6fc497cff87466a7cc6db3ab0d665"
+    },
+    "50071": {
+      "file": "UT Relic 50071.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/91/shp62r85q7ou1xg8o95s652z5vgt791.png",
+      "sha256": "fb2d7a5a694a49d5f75f4fae5926d5d0c7f3970ed6a93bc3d1840960f78f4213"
+    },
+    "50072": {
+      "file": "UT Relic 50072.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/52/8584u2i3l8c3f56pus4t5rw82xd4stz.png",
+      "sha256": "c3dc4f0d0fd3be3232d49e457580aba97242a8c608f3e650f65b0a701f55d6cc"
+    },
+    "50073": {
+      "file": "UT Relic 50073.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/c/c3/k9wwjmofy3ly35qn1jes31m8tweldia.png",
+      "sha256": "9c52778cb27718e558d754ecc80d3f20616f11e9e738e3a5ea7fc8f05e3d4b7a"
+    },
+    "50074": {
+      "file": "UT Relic 50074.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/57/j121kpz59csrpkzdsd1a52bypb62yes.png",
+      "sha256": "37ca5bd60217ffcaaa2771f9ac73f13bed5b58c4daf049cbb550ff9b1c3fa165"
+    },
+    "50075": {
+      "file": "UT Relic 50075.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/07/qdcydco6850und6lrkmlncekxivqxuw.png",
+      "sha256": "b90c20ccc122a083cfae15fbe2814a721d408f2dca7e07d29fdc1c65517eed3f"
+    },
+    "50076": {
+      "file": "UT Relic 50076.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/b/bc/o78mwgecnlwo36awmfizfewx6durmoe.png",
+      "sha256": "fff376424fff3a8bbd54da0b8c1e99e82ee59e7fa2b54a270d64968d60706dea"
+    },
+    "50077": {
+      "file": "UT Relic 50077.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/5/58/lnm6d3ltzqwoitz64wguzatsybzfd9m.png",
+      "sha256": "7a1a42db05a047db423190cae2def9b1c5d0b642006e9dab4dffbd3e13eeecaf"
+    },
+    "50078": {
+      "file": "UT Relic 50078.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/f/fe/i1swu4yhm9fn42cylmvt9e2k3rnyky6.png",
+      "sha256": "f5cc3ed7144be6cd43b5add4705b1634bc613ae0bdc8d9359f8c748f570403d8"
+    },
+    "50079": {
+      "file": "UT Relic 50078.png",
+      "name": "金色飞星",
+      "url": "https://patchwiki.biligame.com/images/starengine/f/fe/i1swu4yhm9fn42cylmvt9e2k3rnyky6.png",
+      "sha256": "f5cc3ed7144be6cd43b5add4705b1634bc613ae0bdc8d9359f8c748f570403d8"
+    },
+    "50081": {
+      "file": "UT Relic 50081.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/c/cc/9qeowrrkcpjxv0h8b2w3lcfmjf636k4.png",
+      "sha256": "c6cb242475e6e4774d9f234c8ba9da592f84cd81db98292a8952ac032ce7f552"
+    },
+    "50082": {
+      "file": "UT Relic 50082.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/9/96/1sbztx3tilv43m4pdhk1e9k5x8t9jqr.png",
+      "sha256": "f9d98714781fe210e08f678fc78f393e3f0611c87714e36df4a748b3b1e2a694"
+    },
+    "50083": {
+      "file": "UT Relic 50083.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/03/0u4e4hssgsrefzjxsnjixwxx1s1tx9v.png",
+      "sha256": "e3f6a9a01403b7304b67a248cf1305e4eb4e17abc5987ca61273e5b1ec2f7201"
+    },
+    "50084": {
+      "file": "UT Relic 50084.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/3/31/kek2og0czpihb2rht11isvj9dxr1fu9.png",
+      "sha256": "44851110824d37785718d8506d1a510478d0d95e59e75a179f38ad11d9f6165b"
+    },
+    "50085": {
+      "file": "UT Relic 50085.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/8a/910dk7rd2axym0wzyi522e1wxq7ypyn.png",
+      "sha256": "507e20664cd8cca7bd7f0e8dfd90fb8b20188ca7b3f1f8faf69d7167e7f93679"
+    },
+    "50086": {
+      "file": "UT Relic 50086.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/d/dc/6s8p730xphuqkw3ajgewcf0pt2tubc0.png",
+      "sha256": "04a77838dcd939cda60001ea1d865716e46de696ee419a8d5d42fa5894c7b000"
+    },
+    "50087": {
+      "file": "UT Relic 50087.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/6/69/b9qr49h1993tkwmqmpse3kdujawu5m3.png",
+      "sha256": "7062bf63bb56fd27a4657b012c98fa8195c6d49bfff5bd8468095234647c0129"
+    },
+    "50088": {
+      "file": "UT Relic 50088.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/0/03/8o57em0ig336oadzxtmac82gbu2gb3i.png",
+      "sha256": "677addbe5421c36730542b5fdd56d4f78d9e40dcd337e104b8f59fc9a1063f4a"
+    },
+    "50089": {
+      "file": "UT Relic 50089.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/2/21/musfsgur4ismf2475q9fz132jdh3918.png",
+      "sha256": "04bcb35919f5b156b390ca8c16f45956fbae4788b9ec5bcf4e203a20e653ffd6"
+    },
+    "50090": {
+      "file": "UT Relic 50090.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/b/bc/ih24zc9xp4xyqxq88mpp45dyu4pem8p.png",
+      "sha256": "9d6580c8160247f2c49d4da23430bbcece395471defbc351e1587e245e3cd5a0"
+    },
+    "50091": {
+      "file": "UT Relic 50091.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/f/f2/db7ykut0zrhx8ppumriyykmrkmqts4k.png",
+      "sha256": "3bcd6001b82e3df761b507f0fe16483d9b93e59addba40abf48ec27aa665cc85"
+    },
+    "50092": {
+      "file": "UT Relic 50092.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/8/81/kmvri5j66l6ozrao73fo3al1e9hfcb8.png",
+      "sha256": "d14543215f3a7b7153a53411da3835471d24a9d71d616c43c616604f50db9bbb"
+    },
+    "50093": {
+      "file": "UT Relic 50093.png",
+      "url": "https://patchwiki.biligame.com/images/starengine/e/e6/6iz057mbhlmt60sny7mgquzd8rd9pr7.png",
+      "sha256": "9af1f4bf3492b3b83d62ba6c4f3e63f4e837c12787fa7e5dcb98b9a896fcc0cb"
+    }
+  }
+}

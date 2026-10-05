@@ -96,3 +96,27 @@ def test_all_help_uses_tilde_and_has_no_pagination():
         assert "~星趴" in text
         assert "/星趴" not in text
         assert "页码" not in text and "每页" not in text
+
+
+async def test_full_review_needs_only_replay_id_and_no_login(replay_bytes):
+    from astralparty.review import build_review
+
+    review = build_review(replay_bytes, "1234567890123456")
+    service = MagicMock(replay=AsyncMock(return_value=review))
+    service.resolve_replay.return_value = "1234567890123456"
+    result = await PartyApp(service).execute(
+        "a", "g", False, "~星趴 复盘 1234567890123456"
+    )
+    service.replay.assert_awaited_once_with("1234567890123456")
+    service.profile.assert_not_called()
+    assert result.visual["kind"] == "review" and len(result.visual["players"]) == 4
+    assert all(f"UID {1234567 + i}" in result.text for i in range(4))
+
+
+async def test_old_review_uid_parameter_shows_new_help_without_downloading():
+    service = MagicMock()
+    with pytest.raises(UserError, match="不需要玩家 UID"):
+        await PartyApp(service).execute(
+            "a", "g", False, "~星趴 复盘 1234567890123456 1234567"
+        )
+    assert not service.mock_calls

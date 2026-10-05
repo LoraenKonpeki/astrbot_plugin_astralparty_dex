@@ -7,7 +7,6 @@ import pytest
 from jinja2 import Environment, StrictUndefined
 
 from astralparty import cards
-from astralparty.errors import UserError
 from astralparty.paths import asset
 from astralparty.profile import profile_from_player
 from astralparty.review import build_review
@@ -28,7 +27,11 @@ class Images(HTMLParser):
 def render(model):
     return (
         Environment(undefined=StrictUndefined, autoescape=True)
-        .from_string(cards.CARD_TEMPLATE)
+        .from_string(
+            cards.REVIEW_TEMPLATE
+            if model.get("kind") == "review"
+            else cards.CARD_TEMPLATE
+        )
         .render(card=model)
     )
 
@@ -56,7 +59,7 @@ def test_all_views_use_correct_character_assets(player, replay_bytes):
         cards.heroes_card(p),
         cards.skins_card(p),
         cards.match_card(r),
-        cards.review_card(r, 1234567),
+        cards.review_card(r),
     ]
     for model in models:
         parser = Images()
@@ -125,16 +128,91 @@ def test_full_collections_and_rounds_are_not_truncated(player, replay_bytes):
     target = review["players"][0]
     target["rounds"] = [{**target["rounds"][0], "round": i} for i in range(1, 41)]
     target["chip_events"] = []
-    model = cards.review_card(review, target["uid"])
-    assert len(model["rows"]) == 40
-    assert model["rows"][-1]["title"] == "第 40 轮"
+    model = cards.review_card(review)
+    assert len(model["timeline"]) == 40
+    assert model["timeline"][-1]["round"] == 40
     assert "下一页" not in render(model)
 
 
-def test_empty_cards_and_invalid_review_player(player, replay_bytes):
+def test_empty_cards_and_missing_review_records(player, replay_bytes):
     p = profile_from_player(player)
     p["recent"] = []
     model = cards.records_card(p)
     assert not model["rows"] and "暂无可查询数据" in render(model)
-    with pytest.raises(UserError, match="不在"):
-        cards.review_card(build_review(replay_bytes, "1234567890123456"), 7654321)
+    review = build_review(replay_bytes, "1234567890123456")
+    review.update(players=[], rounds=0)
+    assert "回放缺少逐轮记录" in render(cards.review_card(review))
+
+
+def test_chip_assets_cover_static_table_with_verified_hashes():
+    manifest = json.loads(asset("assets", "chips", "source.json").read_text())
+    chips = json.loads(asset("assets", "data", "chips.json").read_text())
+    assert {int(i) for i in manifest["files"]} == {c["id"] for c in chips}
+    for cid, info in manifest["files"].items():
+        raw = base64.b64decode(cards.chip_icon(cid).split(",", 1)[1])
+        assert hashlib.sha256(raw).hexdigest() == info["sha256"]
+    assert cards.chip_icon("../../secret") == cards.chip_icon(99999) == ""
+
+
+def test_full_review_keeps_four_players_refresh_chains_and_event_only_rounds(
+    replay_bytes,
+):
+    from astralparty.formatting import review_text
+
+    review = build_review(replay_bytes, "1234567890123456")
+    for index, player in enumerate(review["players"]):
+        player["chip_events"] = [
+            {
+                "id": 50001,
+                "name": "拳击手套-初级",
+                "quality": "蓝",
+                "round": 0 if index == 0 else 3,
+                "source": "shop",
+                "price": 10,
+                "refresh": 2,
+                "arg": 10,
+                "chain": [
+                    {
+                        "cands": [50001, 50002, 50003],
+                        "names": ["拳击手套-初级", "拳击手套-中级", "拳击手套-高级"],
+                        "picked": -1,
+                    },
+                    {
+                        "cands": [50004, 50005, 50006],
+                        "names": ["速度轮滑-初级", "速度轮滑-中级", "速度轮滑-高级"],
+                        "picked": -1,
+                    },
+                    {
+                        "cands": [50001, 50007, 50008],
+                        "names": ["拳击手套-初级", "夹心饼干-一般", "夹心饼干-可口"],
+                        "picked": 0,
+                    },
+                ],
+            }
+        ]
+    review["players"].reverse()
+    model = cards.review_card(review)
+    assert [p["uid"] for p in model["players"]] == [1234567 + i for i in range(4)]
+    assert [r["round"] for r in model["timeline"]] == [0, 1, 2, 3]
+    first = model["timeline"][0]["cells"][0]["events"][0]
+    assert len(first["groups"]) == 3
+    assert [c["picked"] for g in first["groups"] for c in g["candidates"]] == [
+        False
+    ] * 6 + [True, False, False]
+    assert first["price"] == 10
+    html = render(model)
+    assert all(f"玩家{i}" in html for i in range(4))
+    assert "刷新 2" in html and "实付 10" in html
+    text = review_text(review)
+    assert all(f"UID {1234567 + i}" in text for i in range(4))
+    assert text.count("初始候选") == text.count("刷新 2：") == 4
+
+
+def test_review_html_escapes_candidate_names(replay_bytes):
+    review = build_review(replay_bytes, "1234567890123456")
+    review["players"][0]["nick"] = "<script>attack</script>"
+    review["players"][0]["chip_events"][0]["chain"] = [
+        {"cands": [50001], "names": ["<img src=x onerror=attack>"], "picked": 0}
+    ]
+    html = render(cards.review_card(review))
+    assert "<script>" not in html and "&lt;img" in html

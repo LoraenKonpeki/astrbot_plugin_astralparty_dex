@@ -157,3 +157,23 @@ async def test_long_query_renders_exactly_one_complete_image(entrypoint):
     assert len(results) == 1 and results[0].kind == "image"
     plugin.html_render.assert_awaited_once()
     assert len(plugin.html_render.await_args.args[1]["card"]["rows"]) == 32
+
+
+async def test_full_review_uses_wide_table_in_one_image(entrypoint, replay_bytes):
+    from astralparty.cards import review_card
+    from astralparty.review import build_review
+
+    plugin, module = entrypoint
+    model = review_card(build_review(replay_bytes, "1234567890123456"))
+    plugin.app = types.SimpleNamespace(
+        execute=AsyncMock(return_value=Reply("整局复盘", True, model))
+    )
+    plugin.html_render = AsyncMock(return_value="/tmp/review.png")
+    results = [
+        r async for r in plugin.party_command(Event("~星趴 复盘 1234567890123456"))
+    ]
+    assert len(results) == 1 and results[0].kind == "image"
+    plugin.html_render.assert_awaited_once()
+    assert plugin.html_render.await_args.args[0] == module.REVIEW_TEMPLATE
+    assert plugin.html_render.await_args.kwargs["options"]["viewport"]["width"] == 1440
+    assert len(plugin.html_render.await_args.args[1]["card"]["players"]) == 4

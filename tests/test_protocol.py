@@ -169,10 +169,8 @@ def test_synthetic_replay_rounds_chips_and_formatting(replay_bytes):
         and p["chips"][0]["id"] == 50001
     )
     assert "UID 1234567" in match_text(review)
-    text = review_text(review, 1234567)
+    text = review_text(review)
     assert "第 1 轮" in text and "筹码" in text and "来源" in text
-    with pytest.raises(UserError, match="不在"):
-        review_text(review, 9876543)
 
 
 def test_reply_chunk_size():

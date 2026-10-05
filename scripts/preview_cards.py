@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from astralparty.cards import (  # noqa: E402
     CARD_TEMPLATE,
+    REVIEW_TEMPLATE,
     heroes_card,
     match_card,
     profile_card,
@@ -18,6 +19,7 @@ from astralparty.cards import (  # noqa: E402
     skins_card,
 )
 from astralparty.profile import profile_from_player  # noqa: E402
+from astralparty.replay import chip_name, chip_quality  # noqa: E402
 from astralparty.proto_loader import new_msg  # noqa: E402
 
 
@@ -53,7 +55,7 @@ def demo_data():
         "replay_id": "1234567890123456",
         "map_id": 82013,
         "difficulty": 3,
-        "rounds": 18,
+        "rounds": 5,
         "players": [],
     }
     for i, hid in enumerate(heroes[:4]):
@@ -75,6 +77,7 @@ def demo_data():
                 "nick": ["示例玩家", "星币收藏家", "今天也想第一名", "派对旅人"][i],
                 "hero_id": hid,
                 "level": 27 + i,
+                "slot": i,
                 "rounds": rounds,
                 "totals": {
                     "kill": 5 + i,
@@ -85,18 +88,55 @@ def demo_data():
                     "died": i,
                 },
                 "chips": [
-                    {"name": "招财猫"},
-                    {"name": "循环往复"},
-                    {"name": "攻守兼备"},
+                    {"id": cid, "name": chip_name(cid), "quality": chip_quality(cid)}
+                    for cid in [50010, 50083]
                 ],
                 "chip_events": [
                     {
+                        "id": 50010,
                         "round": 2,
-                        "name": "招财猫",
-                        "source": "star",
+                        "name": chip_name(50010),
+                        "quality": chip_quality(50010),
+                        "source": "star" if i % 2 == 0 else "shop",
+                        "arg": 1 if i % 2 == 0 else 10,
+                        "price": None if i % 2 == 0 else 10,
                         "refresh": 1,
-                        "candidates_name": ["招财猫", "攻守兼备", "循环往复"],
-                    }
+                        "chain": [
+                            {
+                                "cands": [50001, 50002, 50003],
+                                "names": [
+                                    chip_name(cid) for cid in [50001, 50002, 50003]
+                                ],
+                                "picked": -1,
+                            },
+                            {
+                                "cands": [50010, 50083, 50015],
+                                "names": [
+                                    chip_name(cid) for cid in [50010, 50083, 50015]
+                                ],
+                                "picked": 0,
+                            },
+                        ],
+                    },
+                    {
+                        "id": 50083,
+                        "round": 4,
+                        "name": chip_name(50083),
+                        "quality": chip_quality(50083),
+                        "source": "task",
+                        "arg": 1,
+                        "refresh": 0,
+                        "price": None,
+                        "chain": [
+                            {
+                                "cands": [50004, 50083, 50018],
+                                "names": [
+                                    chip_name(cid) for cid in [50004, 50083, 50018]
+                                ],
+                                "picked": 1,
+                            }
+                        ],
+                    },
                 ],
             }
         )
@@ -114,14 +154,21 @@ def main():
         "heroes": heroes_card(p),
         "skins": skins_card(p),
         "match": match_card(r, m),
-        "review": review_card(r, 1234567),
+        "review": review_card(r),
     }
     template = Environment(undefined=StrictUndefined, autoescape=True).from_string(
         CARD_TEMPLATE
     )
     for name, model in models.items():
         path = destination / f"{name}-1.html"
-        path.write_text(template.render(card=model), encoding="utf-8")
+        selected = (
+            Environment(undefined=StrictUndefined, autoescape=True).from_string(
+                REVIEW_TEMPLATE
+            )
+            if model.get("kind") == "review"
+            else template
+        )
+        path.write_text(selected.render(card=model), encoding="utf-8")
         print(path)
 
 
