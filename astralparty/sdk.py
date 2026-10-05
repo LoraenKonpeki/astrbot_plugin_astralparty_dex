@@ -41,10 +41,10 @@ class SDK:
     def __init__(self, http, version="3.2.0", timeout=20):
         self.http, self.version, self.timeout = http, version, timeout
 
-    async def _post(self, path, params, signed=True, automatic=False):
+    async def _post(self, path, params, automatic=False):
         body = dict(params)
-        if signed:
-            body["sign"] = signature(params)
+        # All three SDK endpoints require sign, including /api/init.
+        body["sign"] = signature(params)
         headers = {
             "User-Agent": "UnityPlayer/2021.3.45f2 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
             "X-Unity-Version": "2021.3.45f2",
@@ -71,16 +71,26 @@ class SDK:
         if str(out.get("ret")) != "1":
             # Map known conditions rather than echoing a raw response containing credentials.
             msg = str(out.get("msg") or "")
+            stage = {
+                "/api/init": "初始化",
+                "/account/sendCode": "发送验证码",
+                "/account/authorize": "登录认证",
+            }.get(path, "登录服务")
+            lowered = msg.casefold()
+            if "sign" in lowered:
+                if any(w in msg for w in ("不能为空", "缺少", "必填")):
+                    raise UserError(f"{stage}请求缺少签名参数，请更新插件。")
+                raise UserError(f"{stage}请求签名校验失败，请更新插件或联系管理员。")
+            if any(w in lowered for w in ("版本", "clientver", "version")):
+                raise UserError(
+                    f"{stage}使用的客户端版本不受支持，请联系管理员更新插件。"
+                )
             if automatic and any(w in msg for w in ("过期", "重新登录", "token")):
                 raise AuthExpired("登录态已失效，请私聊重新登录。")
             for words, text in [
                 (("验证码",), "验证码无效或过期，请检查后重试，必要时重新发送。"),
                 (("频繁", "频率", "次数"), "请求过于频繁，请稍后再试。"),
                 (("手机号",), "手机号未被登录服务接受，请检查手机号。"),
-                (
-                    ("sign", "版本"),
-                    "登录协议与当前游戏版本不匹配，请联系管理员更新插件。",
-                ),
             ]:
                 if any(w in msg for w in words):
                     raise UserError(text)
@@ -98,7 +108,6 @@ class SDK:
                 "sdk_version": "1.0.0.9",
                 "time": str(int(time.time())),
             },
-            signed=False,
         )
 
     async def send_code(self, phone):

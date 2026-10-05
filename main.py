@@ -27,7 +27,7 @@ background:#131a2a; color:#eef3ff; font-family:"Noto Sans CJK SC","Microsoft YaH
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.1.1",
+    "0.1.2",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):

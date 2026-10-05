@@ -33,11 +33,11 @@ async def test_sms_sdk_signature_and_token_rotation(monkeypatch):
     async def handler(request):
         params = dict(await request.post())
         requests.append((request.path, params))
-        if request.path == "/api/init":
-            assert "sign" not in params
-        else:
-            sig = params.pop("sign")
-            assert sig == signature(params)
+        # Match the real SDK contract: initialization also requires sign.
+        if "sign" not in params:
+            return web.json_response({"ret": 0, "msg": "参数错误:sign参数不能为空"})
+        sig = params.pop("sign")
+        assert sig == signature(params)
         if request.path == "/account/sendCode":
             assert params["type"] == "smslogin"
             out = {"ret": "1"}
@@ -196,3 +196,31 @@ async def test_service_sms_verification_and_persistence(tmp_path, monkeypatch, p
         fake.close.assert_awaited_once()
     finally:
         await service.close()
+
+
+@pytest.mark.parametrize(
+    "server_message,expected,unexpected",
+    [
+        ("参数错误:sign参数不能为空", "初始化请求缺少签名参数", "版本"),
+        ("signError", "初始化请求签名校验失败", "版本"),
+        ("SIGN校验失败", "初始化请求签名校验失败", "版本"),
+        ("ClientVerErr", "客户端版本不受支持", "签名"),
+        ("游戏版本错误", "客户端版本不受支持", "签名"),
+    ],
+)
+async def test_sdk_signature_errors_not_misreported_as_version(
+    monkeypatch, server_message, expected, unexpected
+):
+    async def handler(request):
+        return web.json_response(
+            {"ret": 0, "msg": server_message, "content": {"accessToken": "TOP_SECRET"}}
+        )
+
+    async with http_server(handler) as base:
+        monkeypatch.setattr(sdk_module, "BASE", base)
+        async with aiohttp.ClientSession() as http:
+            with pytest.raises(UserError) as error:
+                await SDK(http).init()
+            assert expected in str(error.value)
+            assert unexpected not in str(error.value)
+            assert "TOP_SECRET" not in str(error.value)
