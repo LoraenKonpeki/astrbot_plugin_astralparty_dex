@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 30px; width: 860px; color: #393447;
+  background: #eeeaf6; font-family: "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif; }
+.sheet { background: #faf9fd; border: 1px solid #dcd5eb; border-radius: 26px; overflow: hidden; }
+.head { padding: 26px 30px 22px; background: #e2ddf4; border-bottom: 1px solid #d2c9e8; }
+.brand { display: flex; justify-content: space-between; color: #706187; font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+.dot { color: #a482bb; }
+.identity { display: flex; align-items: center; gap: 24px; margin-top: 20px; }
+.heading { min-width: 0; flex: 1; }
+.eyebrow { color: #8b729e; font-size: 12px; letter-spacing: 2px; font-weight: 700; margin-bottom: 5px; }
+h1 { font-size: 32px; line-height: 1.35; margin: 0; overflow-wrap: anywhere; font-weight: 800; }
+.subtitle { color: #746c83; font-size: 15px; margin-top: 8px; line-height: 1.7; overflow-wrap: anywhere; }
+.portrait { flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 92px; height: 92px; background: #e9e6f4; border: 1px solid #dcd4e9; border-radius: 20px; }
+.portrait.big { width: 120px; height: 120px; background: #f7f3ff; border-color: #d4c6e4; }
+.portrait img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; }
+.portrait.big img { width: 110px; height: 110px; }
+.placeholder { color: #a895ba; font-size: 36px; }
+.body { padding: 22px 26px 26px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 22px; }
+.stat { background: #f0edf7; border: 1px solid #e1daed; border-radius: 15px; padding: 15px 18px; }
+.value { font-size: 27px; color: #594975; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
+.label { color: #8c819c; font-size: 12px; margin-top: 7px; }
+.section { font-size: 14px; font-weight: 700; color: #81728f; display: flex; gap: 12px; align-items: center; margin: 0 0 14px; }
+.section:after { content: ""; flex: 1; height: 1px; background: #e5dfef; }
+.rows { display: grid; gap: 12px; }
+.rows.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.row { padding: 16px; background: white; border: 1px solid #e3ddec; border-radius: 18px; break-inside: avoid; }
+.row-top { display: flex; align-items: center; gap: 16px; }
+.row-text { flex: 1; min-width: 0; }
+.row-title { font-weight: 750; font-size: 20px; line-height: 1.4; overflow-wrap: anywhere; }
+.row-meta { font-size: 13px; color: #8b8298; line-height: 1.7; margin-top: 5px; overflow-wrap: anywhere; }
+.badge { display: inline-block; border-radius: 8px; padding: 4px 8px; background: #ece7f7; color: #88719c; font-size: 12px; font-weight: 700; margin-top: 6px; }
+.badge.gold { color: #9c732e; background: #faf0d8; }
+.row-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+.small-stat { background: #f8f6fb; border-radius: 10px; padding: 10px 9px; }
+.small-stat b { font-size: 18px; color: #6b587f; display: block; overflow-wrap: anywhere; }
+.small-stat span { color: #998ba4; font-size: 11px; display: block; margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+.chip { font-size: 12px; line-height: 1.5; color: #7a6b88; background: #f1edf7; border-radius: 8px; padding: 5px 9px; overflow-wrap: anywhere; max-width: 100%; }
+.chip.dim { color: #aaa2b3; background: #f7f5fa; }
+.details { margin-top: 12px; font-size: 13px; color: #81758e; line-height: 1.8; overflow-wrap: anywhere; }
+.details strong { color: #675275; }
+.empty { padding: 25px; text-align: center; color: #94879f; background: #f3eff9; border-radius: 16px; }
+.foot { padding: 16px 28px; color: #a194ab; font-size: 12px; line-height: 1.8; background: #f2eff8; border-top: 1px solid #e3ddec; overflow-wrap: anywhere; }
+.footer-tip { color: #8b7b9c; }
+.grid .portrait { width: 72px; height: 72px; border-radius: 14px; }
+.grid .portrait img { width: 64px; height: 64px; }
+.grid .row-top { gap: 12px; }
+.grid .row-title { font-size: 18px; }
+.ordinal { color: #b9aaca; font-size: 13px; font-weight: 600; margin-right: 5px; }
+</style></head><body><div class="sheet">
+<div class="head"><div class="brand"><span>ASTRAL PARTY <span class="dot">✦</span> 星趴档案</span><span>{{ card.page | e }}</span></div>
+<div class="identity">{% if card.avatar %}<div class="portrait big"><img src="{{ card.avatar | e }}" alt="角色像素图"></div>{% endif %}
+<div class="heading"><div class="eyebrow">{{ card.eyebrow | e }}</div><h1>{{ card.title | e }}</h1><div class="subtitle">{{ card.subtitle | e }}</div></div></div></div>
+<div class="body">
+{% if card.metrics %}<div class="stats">{% for metric in card.metrics %}<div class="stat"><div class="value">{{ metric.value | e }}</div><div class="label">{{ metric.label | e }}</div></div>{% endfor %}</div>{% endif %}
+{% if card.section %}<div class="section">{{ card.section | e }}</div>{% endif %}
+<div class="rows {{ card.layout | e }}">
+{% for row in card.rows %}<div class="row"><div class="row-top">
+{% if row.hero %}<div class="portrait">{% if row.avatar %}<img src="{{ row.avatar | e }}" alt="{{ row.hero | e }}">{% else %}<span class="placeholder">✦</span>{% endif %}</div>{% endif %}
+<div class="row-text"><div class="row-title">{% if row.ordinal %}<span class="ordinal">{{ row.ordinal | e }}</span>{% endif %}{{ row.title | e }}</div>
+{% for line in row.meta %}<div class="row-meta">{{ line | e }}</div>{% endfor %}
+{% if row.badge %}<span class="badge {{ row.badge_kind | e }}">{{ row.badge | e }}</span>{% endif %}</div></div>
+{% if row.metrics %}<div class="row-stats">{% for metric in row.metrics %}<div class="small-stat"><b>{{ metric.value | e }}</b><span>{{ metric.label | e }}</span></div>{% endfor %}</div>{% endif %}
+{% if row.chips %}<div class="chips">{% for chip in row.chips %}<span class="chip{% if not chip.owned %} dim{% endif %}">{{ chip.label | e }}</span>{% endfor %}</div>{% endif %}
+{% if row.details %}<div class="details">{% for detail in row.details %}<div><strong>{{ detail.label | e }}</strong> {{ detail.value | e }}</div>{% endfor %}</div>{% endif %}
+</div>{% else %}<div class="empty">{{ card.empty | e }}</div>{% endfor %}
+</div></div><div class="foot">{{ card.footer | e }}{% if card.tip %}<div class="footer-tip">{{ card.tip | e }}</div>{% endif %}</div>
+</div></body></html>

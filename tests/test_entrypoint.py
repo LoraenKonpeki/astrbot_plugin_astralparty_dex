@@ -140,4 +140,5 @@ async def test_image_card_uses_local_file_and_escaped_template(entrypoint):
     results = [r async for r in plugin.party_command(Event("星趴 我的"))]
     assert results[0].kind == "image" and results[0].value == "/tmp/card.png"
     assert plugin.html_render.await_args.kwargs["return_url"] is False
-    assert "{{ text | e }}" in module.CARD_TEMPLATE
+    assert "{{ card.title | e }}" in module.CARD_TEMPLATE
+    assert "{{ detail.value | e }}" in module.CARD_TEMPLATE

@@ -9,3 +9,6 @@ __pycache__/
 *.enc
 *.bin
 .env
+
+/output/
+/.playwright-cli/

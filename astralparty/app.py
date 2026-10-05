@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+from . import cards
 from . import formatting as fmt
 from .errors import UserError
 from .help import DETAILS, help_text
@@ -16,6 +17,7 @@ HELP_WORDS = {"帮助", "help", "-h", "--help"}
 class Reply:
     text: str
     card: bool = False
+    visual: dict | None = None
 
 
 class PartyApp:
@@ -53,7 +55,7 @@ class PartyApp:
         if cmd in {"我的", "刷新"}:
             self._arity(cmd, args, 0, 0)
             p = await self.service.profile(owner, refresh=(cmd == "刷新"))
-            return Reply(fmt.profile_text(p), True)
+            return Reply(fmt.profile_text(p), True, cards.profile_card(p))
         if cmd == "战绩":
             self._arity(cmd, args, 0, 2)
             target = args[0] if args else "我的"
@@ -65,7 +67,7 @@ class PartyApp:
             )
             text = fmt.records_text(p, number)
             self.service.remember_records(owner, conversation, p["recent"])
-            return Reply(text, True)
+            return Reply(text, True, cards.records_card(p, number))
         if cmd in {"对局", "复盘"}:
             self._arity(cmd, args, 1 if cmd == "对局" else 2, 1 if cmd == "对局" else 3)
             replay_id = self.service.resolve_replay(owner, conversation, args[0])
@@ -83,16 +85,21 @@ class PartyApp:
                     if cache
                     else {}
                 )
-                return Reply(fmt.match_text(review, metadata), True)
-            return Reply(fmt.review_text(review, uid, number))
+                return Reply(
+                    fmt.match_text(review, metadata),
+                    True,
+                    cards.match_card(review, metadata),
+                )
+            return Reply(
+                fmt.review_text(review, uid, number),
+                True,
+                cards.review_card(review, uid, number),
+            )
         if cmd == "角色":
             self._arity(cmd, args, 0, 1)
-            return Reply(
-                fmt.heroes_text(
-                    await self.service.profile(owner), args[0] if args else 1
-                ),
-                True,
-            )
+            p = await self.service.profile(owner)
+            number = args[0] if args else 1
+            return Reply(fmt.heroes_text(p, number), True, cards.heroes_card(p, number))
         if cmd == "皮肤":
             self._arity(cmd, args, 0, 2)
             query, number = "", 1
@@ -106,8 +113,11 @@ class PartyApp:
                 else:
                     query = args[0]
                     number = args[1] if len(args) > 1 else 1
+            p = await self.service.profile(owner)
             return Reply(
-                fmt.skins_text(await self.service.profile(owner), query, number), True
+                fmt.skins_text(p, query, number),
+                True,
+                cards.skins_card(p, query, number),
             )
         return Reply(help_text())
 

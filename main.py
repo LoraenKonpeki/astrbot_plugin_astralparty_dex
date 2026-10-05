@@ -8,26 +8,18 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
 
 from .astralparty.app import PartyApp
+from .astralparty.cards import CARD_TEMPLATE, card_pages, text_card
 from .astralparty.errors import UserError
 from .astralparty.formatting import split_text
 from .astralparty.service import PartyService
 from .astralparty.store import owner_key
-
-CARD_TEMPLATE = """<!doctype html><html><head><meta charset="utf-8"><style>
-body {margin:0; padding:32px; width:760px; box-sizing:border-box;
-background:#131a2a; color:#eef3ff; font-family:"Noto Sans CJK SC","Microsoft YaHei",sans-serif;}
-.card {background:#202c42; border:1px solid #526787; border-radius:20px; padding:28px;}
-.brand {color:#b6ccff; font-size:18px; margin-bottom:18px; letter-spacing:2px;}
-.content {font-size:22px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere;}
-</style></head><body><div class="card"><div class="brand">ASTRAL PARTY · 星趴档案助手</div>
-<div class="content">{{ text | e }}</div></div></body></html>"""
 
 
 @register(
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.1.2",
+    "0.2.0",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
@@ -69,17 +61,24 @@ class AstralPartyPlugin(Star):
             )
             if reply.card and self.config.get("image_cards", True):
                 try:
-                    # Split long result pages to keep renderer dimensions bounded.
-                    for part in split_text(reply.text):
-                        image = await self.html_render(
-                            CARD_TEMPLATE,
-                            {"text": part},
-                            return_url=False,
-                            options={
-                                "full_page": True,
-                                "viewport": {"width": 760, "height": 600},
-                            },
+                    images = []
+                    visual = reply.visual or text_card(reply.text)
+                    for visual_page in card_pages(visual):
+                        image = await asyncio.wait_for(
+                            self.html_render(
+                                CARD_TEMPLATE,
+                                {"card": visual_page},
+                                return_url=False,
+                                options={
+                                    "full_page": True,
+                                    "viewport": {"width": 860, "height": 600},
+                                },
+                            ),
+                            timeout=45,
                         )
+                        images.append(image)
+                    # Do not send partial image pages before falling back to the full text.
+                    for image in images:
                         yield event.image_result(image).stop_event()
                     return
                 except Exception as exc:

@@ -145,3 +145,20 @@ async def test_sequence_isolation_expiry_and_unbind(tmp_path):
     with pytest.raises(UserError):
         service.resolve_replay(A, "group", "../../secrets")
     await service.close()
+
+
+async def test_kicked_session_requires_deliberate_refresh(tmp_path):
+    service = PartyService(tmp_path)
+    service.store.save(A, {"token": "token", "uid": 1234567})
+    client = MagicMock()
+    client.alive = False
+    client.failure = SessionConflict("服务器结束会话")
+    client.close = AsyncMock()
+    service.state(A).client = client
+    service.sdk = MagicMock(authorize=AsyncMock())
+    try:
+        with pytest.raises(UserError, match="不会自动接管"):
+            await service.query(A, "7654321")
+        service.sdk.authorize.assert_not_called()
+    finally:
+        await service.close()

@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 import aiohttp
 
 from .client import GameClient
-from .errors import AuthExpired, UserError
+from .errors import AuthExpired, SessionConflict, UserError
 from .profile import profile_from_player, public_profile
 from .review import build_review
 from .sdk import SDK
@@ -229,6 +229,8 @@ class PartyService:
         if not force and state.client and state.client.alive:
             state.client.last_used = time.monotonic()
             return state.client
+        if state.client and isinstance(state.client.failure, SessionConflict):
+            state.blocked = True
         if state.blocked and not force:
             raise UserError(
                 "上次连接未成功，请退出游戏后私聊 /星趴 刷新；插件不会自动接管在线账号。"
@@ -285,7 +287,9 @@ class PartyService:
                 except UserError:
                     simple = None
                 return public_profile(show, simple, uid)
-            except UserError:
+            except UserError as exc:
+                if isinstance(exc, SessionConflict):
+                    state.blocked = True
                 await client.close()
                 state.client = None
                 raise

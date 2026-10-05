@@ -314,6 +314,7 @@ def _recent_of(p, my_uid):
                     "gold": int(getattr(it, "gold", 0) or 0),
                     "rank": int(getattr(it, "rank", 0) or 0),
                     "slot": int(getattr(it, "slot", 0) or 0),
+                    "mapType": int(getattr(it, "mapType", 0) or 0),
                     "giveUp": bool(getattr(it, "isGiveUp", False)),
                     "me": int(getattr(it, "playerId", 0)) == my_uid,
                     "stats": None,  # ← 结算数值填入此处
@@ -324,7 +325,7 @@ def _recent_of(p, my_uid):
         if d0 is None:
             continue
         hid = d0["heroId"]
-        mt = int(getattr(d0, "mapType", 0) or 0)
+        mt = int(d0.get("mapType", 0) or 0)
         recent.append(
             {
                 "time": getattr(r, "time", 0),

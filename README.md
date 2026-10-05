@@ -68,8 +68,8 @@ https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex
 
 ## 展示与数据行为
 
-- 个人资料、战绩、角色、皮肤和单局详情默认使用 AstrBot HTML 渲染生成图片。失败时回退文字；可关闭 `image_cards`。服务器渲染环境应具有中文字体，例如 Noto Sans CJK。
-- 总帮助、详细帮助、登录反馈和逐轮复盘使用文字；长消息按长度拆分发送。
+- 个人资料、战绩、角色、皮肤、单局详情和逐轮复盘默认使用 AstrBot HTML 渲染生成图片。失败时回退文字；可关闭 `image_cards`。服务器渲染环境应具有中文字体，例如 Noto Sans CJK。
+- 总帮助、详细帮助和登录反馈使用文字；长消息按长度拆分发送。
 - 自己的资料来自游戏登录握手包，普通查询复用快照并显示获取时间，避免连续登录。需要新数据时主动私聊刷新。
 - 查询其他 UID 使用自己的登录会话，单用户请求串行，外部 UID 查询冷却 3 秒，全局并发上限 4。
 - 游戏连接有心跳，默认闲置 180 秒关闭，断线不会无限重试。登录失败后需用户主动刷新或重新登录。
@@ -98,6 +98,18 @@ replays/*.bin         # 公共回放缓存
 
 所有指令（包括拒绝的群聊登录）停止后续事件传播；插件日志不输出原始凭据或异常正文。不过消息平台、AstrBot 自身日志和其他先执行的插件仍可能留存消息，因此应避免群内发送手机号或验证码，管理员也应配置适当的消息日志保留策略。
 
+## 图片卡片
+
+卡片使用本地内置的 32 个 Pixel 角色小人，并按角色 ID 显示在资料、战绩、角色列表、皮肤列表、单局和逐轮复盘中。采用分区统计、角色卡片和分页布局，未知角色显示占位图；皮肤列表中的小人表示角色，不代表该皮肤的外观。素材原路径、版本和校验值见 [来源清单](assets/pixel/source.json)。
+
+下面为合成数据预览，并非真实账号记录。
+
+![资料卡片](docs/previews/profile.png)
+
+![单局卡片](docs/previews/match.png)
+
+开发预览使用合成数据：`python scripts/preview_cards.py`，生成的 HTML 位于 `output/playwright/`。
+
 ## 配置
 
 | 配置项 | 默认值 | 说明 |
@@ -118,7 +130,7 @@ replays/*.bin         # 公共回放缓存
 ## 开发与验证
 
 ```bash
-python -m pip install -r requirements.txt pytest pytest-asyncio ruff
+python -m pip install -r requirements-dev.txt
 ruff check .
 ruff format --check .
 python -m pytest -q
@@ -128,8 +140,10 @@ python -m pytest -q
 
 测试使用本地模拟服务与合成回放。SDK 初始化签名已通过线上服务验证（不涉及手机号或用户登录凭据）；**尚未使用真实账号验证短信、国服登录和游戏实战回放，也未完成 QQ 平台现场联调**。上游协议来自客户端分析，游戏更新可能需要适配；安装后请先私聊检查 `/星趴 帮助` 和登录流程。
 
+协议资料包的核验结果和采用的规则见 [RPC 交接资料学习记录](docs/RPC_HANDOFF_NOTES.md)。
+
 ## 来源与许可
 
 插件采用 MIT 许可，详见 [LICENSE](LICENSE)。协议编解码、描述符加载、回放/复盘解析、角色皮肤解析、静态表及 SDK 签名常量移植或参考了 [AstralParty_Dex](https://github.com/ZtyanCrany/AstralParty_Dex)，保留上游作者 Nemophila & ZtyanCrany 的许可，见 [licenses/AstralParty_Dex-MIT.txt](licenses/AstralParty_Dex-MIT.txt)。
 
-本插件与游戏开发方、运营方无关联。游戏协议、名称和数据的相关权利属于原权利方；仓库不包含游戏头像、立绘等美术素材。附带的签名常量来自上游公开项目，不是用户登录凭据。请遵循上游的学习研究用途说明，避免商业用途与大规模数据抓取。
+本插件与游戏开发方、运营方无关联。游戏协议、名称和数据的相关权利属于原权利方；像素角色素材来自用户指定的 [StarEngine_Picture_Resources](https://github.com/LoraenKonpeki/StarEngine_Picture_Resources)，素材权利属于原权利方，不因插件代码采用 MIT 而改变。附带的签名常量来自上游公开项目，不是用户登录凭据。请遵循上游的学习研究用途说明，避免商业用途与大规模数据抓取。
