@@ -1,7 +1,7 @@
 name: astrbot_plugin_astralparty_dex
 display_name: 星趴档案助手
 desc: 吉星派对短信登录、个人档案、近期战绩、角色皮肤与逐轮复盘；登录仅限私聊，内置完整指令帮助。
-version: v0.3.0
+version: v0.3.1
 author: Loraen_Konpeki
 repo: https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex
 astrbot_version: ">=4.3.2,<5"

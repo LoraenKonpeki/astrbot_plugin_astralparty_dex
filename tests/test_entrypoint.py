@@ -177,3 +177,42 @@ async def test_full_review_uses_wide_table_in_one_image(entrypoint, replay_bytes
     assert plugin.html_render.await_args.args[0] == module.REVIEW_TEMPLATE
     assert plugin.html_render.await_args.kwargs["options"]["viewport"]["width"] == 1440
     assert len(plugin.html_render.await_args.args[1]["card"]["players"]) == 4
+
+
+async def test_image_sends_separate_copyable_identifiers(entrypoint):
+    plugin, _ = entrypoint
+    plugin.app = types.SimpleNamespace(
+        execute=AsyncMock(
+            return_value=Reply(
+                "完整复盘含回放号 1234567890123456",
+                True,
+                copy_text="可复制编号\n回放号：1234567890123456\n玩家 1 UID：1234567",
+            )
+        )
+    )
+    plugin.html_render = AsyncMock(return_value="/tmp/review.png")
+    results = [r async for r in plugin.party_command(Event("~星趴 复盘 1"))]
+    assert [r.kind for r in results] == ["image", "text"]
+    assert "回放号：1234567890123456" in results[1].value
+    assert all(r.stopped for r in results)
+
+
+@pytest.mark.parametrize("images_enabled", [True, False])
+async def test_text_fallback_does_not_duplicate_identifier_message(
+    entrypoint, images_enabled
+):
+    plugin, _ = entrypoint
+    plugin.config["image_cards"] = images_enabled
+    full = "整局复盘 · 回放 1234567890123456\n玩家 UID 1234567"
+    plugin.app = types.SimpleNamespace(
+        execute=AsyncMock(
+            return_value=Reply(
+                full, True, copy_text="可复制编号\n回放号：1234567890123456"
+            )
+        )
+    )
+    plugin.html_render = AsyncMock(side_effect=RuntimeError("render failed"))
+    results = [r async for r in plugin.party_command(Event("~星趴 复盘 1"))]
+    assert len(results) == 1 and results[0].value == full
+    if not images_enabled:
+        plugin.html_render.assert_not_called()

@@ -120,3 +120,57 @@ async def test_old_review_uid_parameter_shows_new_help_without_downloading():
             "a", "g", False, "~星趴 复盘 1234567890123456 1234567"
         )
     assert not service.mock_calls
+
+
+async def test_records_copy_text_matches_all_record_numbers(player):
+    p = profile_from_player(player)
+    p["recent"] = [
+        {**p["recent"][0], "replayId": str(1234567890123456 + i)} for i in range(10)
+    ]
+    service = MagicMock(profile=AsyncMock(return_value=p))
+    reply = await PartyApp(service).execute("a", "g", False, "~星趴 战绩")
+    assert "UID：1234567" in reply.copy_text
+    assert all(
+        f"战绩 {i + 1} 回放号：{r['replayId']}" in reply.copy_text
+        for i, r in enumerate(p["recent"])
+    )
+
+
+@pytest.mark.parametrize("command", ["对局", "复盘"])
+async def test_replay_copy_text_resolves_short_index_and_lists_players(
+    command, replay_bytes
+):
+    from astralparty.review import build_review
+
+    review = build_review(replay_bytes, "1234567890123456")
+    review["players"].reverse()
+    service = MagicMock(replay=AsyncMock(return_value=review))
+    service.resolve_replay.return_value = review["replay_id"]
+    service.records = {}
+    reply = await PartyApp(service).execute("a", "g", False, f"~星趴 {command} 1")
+    assert "回放号：1234567890123456" in reply.copy_text
+    assert all(f"玩家 {i + 1} UID：{1234567 + i}" in reply.copy_text for i in range(4))
+
+
+@pytest.mark.parametrize("command", ["我的", "刷新", "角色", "皮肤 101"])
+async def test_profile_and_collections_copy_public_ids(command, player):
+    service = MagicMock(profile=AsyncMock(return_value=profile_from_player(player)))
+    reply = await PartyApp(service).execute("a", "private", True, f"~星趴 {command}")
+    assert "UID：1234567" in reply.copy_text
+    if command in {"角色", "皮肤 101"}:
+        assert "角色ID：101" in reply.copy_text
+
+
+def test_copyable_ids_omit_missing_or_invalid_values():
+    from astralparty.formatting import identifier_text
+
+    assert (
+        identifier_text(
+            ("UID", None), ("回放号", ""), ("UID", 0), ("回放号", "unknown")
+        )
+        == ""
+    )
+    assert (
+        identifier_text(("回放号", "1234567890123456"))
+        == "可复制编号\n回放号：1234567890123456"
+    )

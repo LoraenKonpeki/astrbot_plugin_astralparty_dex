@@ -19,7 +19,7 @@ from .astralparty.store import owner_key
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.3.0",
+    "0.3.1",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
@@ -80,6 +80,9 @@ class AstralPartyPlugin(Star):
                         timeout=45,
                     )
                     yield event.image_result(image).stop_event()
+                    if reply.copy_text:
+                        for part in split_text(reply.copy_text):
+                            yield event.plain_result(part).stop_event()
                     return
                 except Exception as exc:
                     # Exception values or tracebacks may contain URLs/input. Log only the type.

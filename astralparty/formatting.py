@@ -198,3 +198,13 @@ def split_text(text, max_chars=1800):
     if chunk:
         parts.append(chunk.rstrip())
     return parts or ["暂无数据。"]
+
+
+def identifier_text(*pairs):
+    """Copyable public IDs only; never scan arbitrary replies or credential data."""
+    lines = []
+    for label, value in pairs:
+        value = str(value) if value is not None else ""
+        if value.isascii() and value.isdigit() and int(value) > 0:
+            lines.append(f"{label}：{value}")
+    return "可复制编号\n" + "\n".join(lines) if lines else ""
