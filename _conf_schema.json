@@ -1,0 +1,12 @@
+{
+  "image_cards": {"description": "将个人资料、战绩、角色皮肤与单局详情渲染为图片（失败时回退文字）", "type": "bool", "default": true},
+  "game_host": {"description": "国服游戏 TCP 服务器地址", "type": "string", "default": "101.132.186.71"},
+  "game_port": {"description": "国服游戏 TCP 端口", "type": "int", "default": 8800},
+  "client_version": {"description": "游戏协议客户端版本（仅在确认协议变化后调整）", "type": "string", "default": "3.2.0"},
+  "request_timeout": {"description": "网络请求超时秒数（5～60）", "type": "int", "default": 20},
+  "session_idle_seconds": {"description": "游戏会话闲置关闭秒数（30～1800），资料快照仍保留", "type": "int", "default": 180},
+  "max_sessions": {"description": "同时保留的游戏会话上限（1～100）", "type": "int", "default": 20},
+  "max_replay_mb": {"description": "单个回放文件大小上限 MB（1～64）", "type": "int", "default": 16},
+  "cache_mb": {"description": "回放缓存总大小上限 MB（32～2048）", "type": "int", "default": 200},
+  "cache_days": {"description": "回放缓存保留天数（1～30）", "type": "int", "default": 7}
+}
