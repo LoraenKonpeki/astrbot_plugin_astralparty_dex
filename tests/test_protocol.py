@@ -273,3 +273,20 @@ async def test_kick_push_ends_session_without_waiting_for_timeout():
             await asyncio.wait_for(c.show(7654321), 1)
         assert not c.alive and isinstance(c.failure, SessionConflict)
         await c.close()
+
+
+@pytest.mark.parametrize("name", ["自定义房间", "hank2006", ""])
+async def test_replay_room_names_are_not_fixed(name, replay_bytes):
+    from astralparty.replay import parse_replay
+    from tests.conftest import varint
+
+    original = parse_replay(replay_bytes)
+    data = bytearray(b"\x08\x01")
+    for snapshot in original.frames:
+        room = snapshot["room"]
+        room.name = name
+        raw = room.SerializeToString()
+        data.extend(b"\x12" + varint(len(raw)) + raw)
+    review = build_review(bytes(data), "1234567890123456")
+    assert review["frames"] == 2 and len(review["players"]) == 4
+    assert review["rounds"] == 2

@@ -19,7 +19,7 @@ from .astralparty.store import owner_key
     "astrbot_plugin_astralparty_dex",
     "Loraen_Konpeki",
     "星趴登录、战绩与逐轮复盘助手",
-    "0.3.1",
+    "0.3.2",
     "https://github.com/LoraenKonpeki/astrbot_plugin_astralparty_dex",
 )
 class AstralPartyPlugin(Star):
@@ -62,17 +62,20 @@ class AstralPartyPlugin(Star):
             if reply.card and self.config.get("image_cards", True):
                 try:
                     visual = reply.visual or text_card(reply.text)
+                    scale = max(1, min(3, int(self.config.get("image_scale", 2))))
                     image = await asyncio.wait_for(
                         self.html_render(
                             REVIEW_TEMPLATE
                             if visual.get("kind") == "review"
                             else CARD_TEMPLATE,
-                            {"card": visual},
+                            {"card": visual, "render_scale": scale},
                             return_url=False,
                             options={
                                 "full_page": True,
+                                "type": "jpeg",
+                                "quality": 95,
                                 "viewport": {
-                                    "width": visual.get("width", 860),
+                                    "width": visual.get("width", 860) * scale,
                                     "height": 600,
                                 },
                             },

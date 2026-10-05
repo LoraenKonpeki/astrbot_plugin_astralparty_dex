@@ -140,6 +140,9 @@ async def test_image_card_uses_local_file_and_escaped_template(entrypoint):
     results = [r async for r in plugin.party_command(Event("星趴 我的"))]
     assert results[0].kind == "image" and results[0].value == "/tmp/card.png"
     assert plugin.html_render.await_args.kwargs["return_url"] is False
+    assert plugin.html_render.await_args.kwargs["options"]["quality"] == 95
+    assert plugin.html_render.await_args.kwargs["options"]["viewport"]["width"] == 1720
+    assert plugin.html_render.await_args.args[1]["render_scale"] == 2
     assert "{{ card.title | e }}" in module.CARD_TEMPLATE
     assert "{{ detail.value | e }}" in module.CARD_TEMPLATE
 
@@ -175,7 +178,7 @@ async def test_full_review_uses_wide_table_in_one_image(entrypoint, replay_bytes
     assert len(results) == 1 and results[0].kind == "image"
     plugin.html_render.assert_awaited_once()
     assert plugin.html_render.await_args.args[0] == module.REVIEW_TEMPLATE
-    assert plugin.html_render.await_args.kwargs["options"]["viewport"]["width"] == 1440
+    assert plugin.html_render.await_args.kwargs["options"]["viewport"]["width"] == 2880
     assert len(plugin.html_render.await_args.args[1]["card"]["players"]) == 4
 
 

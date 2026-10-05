@@ -19,13 +19,11 @@
 
 from __future__ import annotations
 
-import re
 import struct
 from pathlib import Path
 
 from .proto_loader import msg_class
 
-ANCHOR = b"\x12\x05match"  # Room#2 = 房名（固定 "match"），用作帧起点特征
 CHIP_MIN, CHIP_MAX = 50001, 50093  # 真·筹码 ID 段
 COND_FIELDS = (
     "kill_count",
@@ -146,36 +144,29 @@ class Replay:
         self._parse_packets()
 
     # ── 帧 ────────────────────────────────────────────────
-    def _room_starts(self):
-        """帧起点 = "12 05 'match'" 的位置（Room#2 房名），且其前 9 字节须是 09 <房号 fixed64>"""
-        d = self.data
-        out = []
-        for m in re.finditer(re.escape(ANCHOR), d):
-            s = m.start() - 9
-            if s >= 1 and d[s] == 0x09:  # Room 以 09 <房号 fixed64> 开头
-                out.append(s)
-        return out
-
     def _parse_frames(self):
+        """Find length-delimited Room snapshots by schema, without a fixed room name."""
         RoomMsg = msg_class("model.Room")
         d = self.data
-        starts = self._room_starts()
-        for idx, s in enumerate(starts):
-            ln = None
-            for back in (3, 2, 1, 4, 5):
-                p = s - back
-                if p >= 1 and d[p] == 0x12:
-                    v, after = _rv(d, p + 1)
-                    if v and after == s:
-                        ln = v
-                        break
-            if not ln:
+        skip_until = 0
+        for offset, tag in enumerate(d):
+            if offset < skip_until or tag != 0x12:
+                continue
+            ln, start = _rv(d, offset + 1)
+            if not ln or start + ln > len(d) or d[start] != 0x09:
                 continue
             try:
                 room = RoomMsg()
-                room.ParseFromString(d[s : s + ln])
+                room.ParseFromString(d[start : start + ln])
             except Exception:
                 continue
+            # Nested player/packet messages also begin with field 1; require actual heroes.
+            if not room.players or not all(
+                pl.id > 0 and 100 <= pl.hero.hero_id <= 999 for pl in room.players
+            ):
+                continue
+            s, idx = start, len(self.frames)
+            skip_until = start + ln
             hround = {}
             for pl in room.players:
                 hround[pl.id] = pl.hero.round
